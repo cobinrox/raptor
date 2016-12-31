@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.cobinrox</groupId>
+        <artifactId>raptor</artifactId>
+        <version>1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+  <groupId>com.cobinrox</groupId>
+  <artifactId>io</artifactId>
+  <version>1</version>
+  <packaging>jar</packaging>
+
+  <name>io</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <pi4j.version>0.0.5</pi4j.version>
+    <compiler-plugin.version>3.1</compiler-plugin.version>
+    <assembly-plugin.version>2.4</assembly-plugin.version>
+  </properties>
+
+    <repositories>
+        <repository>
+            <id>locallib</id>
+            <url>file://${project.basedir}/../mylib</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+  <dependency>
+    <groupId>com.cobinrox</groupId>
+    <artifactId>common</artifactId>
+    <version>1</version>
+  </dependency>
+      <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.17</version>
+      </dependency>
+
+  <dependency>
+            <groupId>com.pi4j</groupId>
+            <artifactId>pi4j-core</artifactId>
+            <version>${pi4j.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.pi4j</groupId>
+                    <artifactId>pi4j-native</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+      <!-- dll -->
+      <dependency>
+          <groupId>org.usb4java</groupId>
+          <artifactId>libusb4java</artifactId>
+          <version>1.2.1-SNAPSHOT-windows-x86_64</version>
+      </dependency>
+      <!-- java classes -->
+      <dependency>
+          <groupId>org.usb4java</groupId>
+          <artifactId>usb4java</artifactId>
+          <version>1.2.1-SNAPSHOT</version>
+      </dependency>
+  </dependencies>
+    <build>
+        <finalName>rap_io</finalName>
+        <plugins>
+            <!--plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>bat</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin-->
+
+
+
+
+
+
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>2.4</version>
+              <executions>
+                  <execution>
+                      <phase>package</phase>
+                      <goals>
+                          <goal>shade</goal>
+                      </goals>
+                      <configuration>
+                          <transformers>
+                              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>com.cobinrox.io.DoMotorCmd</mainClass>
+                              </transformer>
+                          </transformers>
+                          <!--artifactSet>
+                              <includes>
+
+                              </includes>
+                          </artifactSet-->
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <targetPath>${project.build.directory}</targetPath>
+                <includes>
+                    <!-- leave out of jar file -->
+                    <include>io.properties</include>
+                    <include>log4j.xml</include>
+
+                </includes>
+            </resource>
+            <!--resource>
+                <filtering>true</filtering>
+                <directory>${project.basedir}/bat</directory>
+                <targetPath>${project.build.directory}</targetPath>
+                <includes>
+                    <include>rundmc.bat</include>
+                </includes>
+            </resource-->
+        </resources>
+    </build>
+
+</project>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-us" ng-app="myApp">
+<head>
+    <title>Egor Project Main Page Hoo Hah</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta charset="UTF-8">
+
+    <!-- load bootstrap and fontawesome -->
+    <link rel="stylesheet" href="js/bs335/css/bootstrap.min.css" />
+    <style>
+        html, body, input, select, textarea
+        {
+            font-size: 1.05em;
+        }
+    </style>
+
+    <!-- load angular  -->
+    <script src="js/angular.js"></script>
+    <script src="js/angular-messages.min.js"></script>
+    <script src="js/angular-resource.min.js"></script>
+    <!-- load our stuff -->
+    <script src="js/app.js"></script>
+
+
+</head>
+<body>
+
+<header>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">EgorProject</a>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fa fa-settings"></i> Settings</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+
+    <div ng-controller="mainController">
+        <h1>Hello and welcome to {{g_projectName}} by {{f_lowerCaseIt()}}</h1>
+        <p>(Use Ctrl-Shift-J to view console on Chrome)</p>
+        <p>(Use F12 to view console on IE)</p>
+        <hr/>
+        <!-- I M A G E -->
+
+        <div ng-init="image_reloader(timer=2000,src='img.jpg')">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <img ng-src="{{image_url}}" height="100" width="100"></img>
+        </div>
+
+        <div>
+            &nbsp;
+        </div>
+
+        <!-- B U T T O N S -->
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" value="FL" id="FL" data-ng-click="f_moveClick('FL')">
+            &nbsp;&nbsp;
+            <input type="button" value=" F " id="F" data-ng-click="f_moveClick('F')">
+            &nbsp;&nbsp;
+            <input type="button" value="FR" id="FR" data-ng-click="f_moveClick('FR')">
+
+        </div>
+        <div>
+            <input type="button" value="FLL" id="FLL" data-ng-click="f_moveClick('FLL')">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <input type="button" value="FRR" id="FRR" data-ng-click="f_moveClick('FRR')">
+
+        </div>
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="L" id="L" data-ng-click="f_moveClick('L')">
+            <input type="button" value="B R A K E" id="BRAKE" data-ng-click="f_moveClick('BRAKE')">
+            <input type="button" value="R" id="R" data-ng-click="f_moveClick('R')">
+
+        </div>
+        <div>
+            <input type="button" value="BLL" id="BLL" data-ng-click="f_moveClick('BLL')">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <input type="button" value="BRR" id="BRR" data-ng-click="f_moveClick('BRR')">
+
+        </div>
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="BL" id="BL" data-ng-click="f_moveClick('BL')">
+            &nbsp;&nbsp;
+            <input type="button" value=" B " id="B" data-ng-click="f_moveClick('B')">
+            &nbsp;&nbsp;
+            <input type="button" value="BR" id="BR" data-ng-click="f_moveClick('BR')">
+        </div>
+        <div>&nbsp;</div>
+         <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+
+        <!-- DEBUG AREA -->
+        <hr/>
+        <div>
+            <label>Ad-hoc Egor Cmd: (F,B,L,R,FR,FL,BR,BL)</label>
+            <input type="text" ng-model="g_moveCmd"/>{{g_moveCmd}}
+            <input type="button" value="Send" ng-click="f_adhocClick()">
+        </div>
+        <div>
+            (D_SIM_1,D_SIM_0)
+        </div>
+        <hr/>
+        <div><label>Response</label>{{g_moveResponse}}</div>
+        <div><label>Status Code</label></div>
+        <div><textarea rows="1" cols="50" ng-model="g_httpStatusCode"></textarea></div>
+        <div><label>Raw Response Data</label></div>
+        <div><textarea rows="4" cols="50" ng-model="g_httpResponseData"></textarea></div>
+        <div><label>Error Message</label></div>
+        <div><textarea rows="4" cols="50" ng-model="g_error"></textarea></div>
+    </div> <!-- controller -->
+</div> <!-- container -->
+</body>
+</html>

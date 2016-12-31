@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/io/target/classes" />
+    <output-test url="file://$MODULE_DIR$/io/target/test-classes" />
+    <content url="file://$MODULE_DIR$/io">
+      <sourceFolder url="file://$MODULE_DIR$/io/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/io/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/io/src/test/java" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/io/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="common" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: com.pi4j:pi4j-core:0.0.5" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:1.2.1-SNAPSHOT-windows-x86_64" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:usb4java:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:linux-x86:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:linux-x86_64:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:linux-arm:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:windows-x86:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:windows-x86_64:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:osx-x86:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.usb4java:libusb4java:osx-x86_64:1.2.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
+  </component>
+</module>

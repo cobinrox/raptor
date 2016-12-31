@@ -1,0 +1,6 @@
+sudo apt-get install samba
+
+pi@raspberrypi~$ sudo apt-get install samba-common-bin
+
+sudo vi /etc/samba/smb.conf
+

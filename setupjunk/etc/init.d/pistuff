@@ -1,0 +1,43 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          pistuff
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5 
+# Default-Stop:      0 1 6
+# Short-Description: Simple script to start a program at boot
+# Description:       A simple script from www.stuffaboutcode.com which will start / stop a program a boot / shutdown.
+### END INIT INFO
+
+# If you want a command to always run, put it here
+
+# set up logging
+exec > /tmp/pistuff.log 2>&1
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting pistuff"
+
+    #sudo /home/pi/goon/goon.sh &
+    #sudo /home/pi/code/mjpg-streamer/start.sh &
+#
+    #sudo /home/pi/goon/mjpg-streamer-experimental/www/egor/cmdtx.sh & 
+    #sudo /home/pi/code/mjpg-streamer/www/egor/cmdtx.sh &
+    cd /home/pi
+    sudo python /home/pi/take_pic.py &
+    sudo /home/pi/ipAudio/ipAudio.sh &
+    ;;
+  stop)
+    echo "Stopping pistuff"
+    # kill application you want to stop
+    killall take_pic.py
+    ;;
+  *)
+    echo "Usage: /etc/init.d/pistuff {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/blinds" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/io" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/io/log4j.xml" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/io/src/main/resources/io - Copy.properties" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/arrngarrng.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/cats.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/creek.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/crow.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/excuseme.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/ghostly1.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/goodbye.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/hi.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/laugh.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/owl.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/scream.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/storm.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/witch.wav" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/rap-web/src/main/resources/wolf.wav" charset="windows-1252" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

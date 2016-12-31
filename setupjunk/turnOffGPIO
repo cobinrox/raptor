@@ -1,0 +1,38 @@
+#! /bin/sh
+# /etc/init.d/noip 
+
+### BEGIN INIT INFO
+# Provides:          turnOffGPIO 
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5  
+# Default-Stop:      0 1 6
+# Short-Description: Simple script to start a program at boot
+# Description:       turns off gpio pins 
+### END INIT INFO
+
+# 1) MOVE THIS DAEMON SCRIPT TO /etc/init.d
+# 2) REGISTER THIS SCRIPT BY RUNNING: sudo update-rc.d turnOffGPIO defaults
+#
+
+# set up logging
+exec > /tmp/turnOffGPIO.log 2>&1
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting turnOffGPIO"
+    # run application you want to start
+    /home/pi/turnOffGPIO.sh
+    ;;
+  stop)
+    echo "Stopping turnOffGPIO"
+    # kill application you want to stop
+    #killall noip2
+    ;;
+  *)
+    echo "Usage: service turnOffGPIO {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

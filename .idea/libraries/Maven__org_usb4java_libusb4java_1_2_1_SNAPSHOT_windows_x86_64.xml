@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.usb4java:libusb4java:1.2.1-SNAPSHOT-windows-x86_64">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.2.1-SNAPSHOT-windows-x86_64/libusb4java-1.2.1-SNAPSHOT-windows-x86_64.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.2.1-SNAPSHOT-windows-x86_64/libusb4java-1.2.1-SNAPSHOT-windows-x86_64-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/usb4java/libusb4java/1.2.1-SNAPSHOT-windows-x86_64/libusb4java-1.2.1-SNAPSHOT-windows-x86_64-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

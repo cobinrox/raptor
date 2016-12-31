@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/common.iml" filepath="$PROJECT_DIR$/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/io.iml" filepath="$PROJECT_DIR$/io.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rap-web.iml" filepath="$PROJECT_DIR$/rap-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/raptor.iml" filepath="$PROJECT_DIR$/raptor.iml" />
+    </modules>
+  </component>
+</project>

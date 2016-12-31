@@ -1,0 +1,30 @@
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto wlan0
+allow-hotplug wlan0 eth0
+iface wlan0 inet manual
+wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet dhcp
+#auto wlan0
+#allow-hotplug wlan0
+#iface wlan0 inet static
+#address 192.168.42.1
+#netmask 255.255.255.0
+nameserver 8.8.8.8
+nameserver 8.8.8.4
+nameserver 205.171.3.65
+nameserver 205.171.2.65
+#wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+
+#wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+#ddress 192.168.0.6
+#netmask 255.255.255.0
+#gateway 192.168.0.1
+
+iface cox2 inet dhcp
+iface issm inet dhcp
+#face issp inet dhcp
+#up iptables-restore < /etc/iptables.ipv4.nat

@@ -1,0 +1,71 @@
+Git Installer for Windows
+================================
+Git-Gui Shawn Pearce et al
+
+Git Glossary
+================================
+commit does not mean the traditional commit, means put it into your
+local repository (similar to "install" command in maven)
+
+push means push changes up to remote repository
+(similar to "deploy" in maven)
+
+After installing git
+================================
+git config --global user.name 'some user name'
+git config --global user.email 'useremail@associatedWithGithublogin.com'
+git config --global color.ui 'auto'
+
+Download entire remote project:
+================================
+change to directory parent of where project is to lie
+git clone https://github.com/cobinrox/archie
+
+
+Create new repo
+================================
+create new remote repo on github, but disclude readme.md
+create new local repo on local box
+git init
+git add --all
+git commit -am "initial commit"
+git remote add origin yourGitHubRepoURL
+git push origin master
+
+Commit new files/dirs:
+================================
+git add --all
+git commit -am "add more files"
+git push
+
+Commit all modified files:
+================================
+git commit -am "add n modified"
+git push
+
+Download new files:
+================================
+git pull
+
+
+Check status wrt remote repo:
+================================
+git fetch [origin]
+git status
+-- or --
+git remote update
+git status
+-- or --
+git diff master origin/master
+
+Note: empty folders don't show up
+Note: intelliJ requires a commit first
+
+Undo local changes to a file
+================================
+get checkout theFile
+(checks out the file from local repo)
+
+Zip project files, exclusing .git directory
+===========================================
+git archive --format zip --output filename.zip master
