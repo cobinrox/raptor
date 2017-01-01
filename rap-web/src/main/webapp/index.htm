@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us" ng-app="myApp">
+<html lang="en-us" ng-app="egorApp">
 <head>
     <title>Egor Project Main Page Hoo Hah</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -19,7 +19,7 @@
     <script src="js/angular-messages.min.js"></script>
     <script src="js/angular-resource.min.js"></script>
     <!-- load our stuff -->
-    <script src="js/app.js"></script>
+    <script src="js/egorApp.js"></script>
 
 
 </head>
@@ -42,67 +42,132 @@
 
 <div class="container">
 
-    <div ng-controller="mainController">
+    <!-- Connect this div to the back end egor JS app's controller -->
+    <div class="container text-center"  ng-controller="egorController">
+        <!-- double handlebar moustaches bind the backend $scope global vars defined in the AJS app file -->
+        <!-- you could think of this as egorApp.egorController.g_projectName in a java program -->
         <h1>Hello and welcome to {{g_projectName}} by {{f_lowerCaseIt()}}</h1>
         <p>(Use Ctrl-Shift-J to view console on Chrome)</p>
         <p>(Use F12 to view console on IE)</p>
         <hr/>
-        <!-- I M A G E -->
+        <div class="col-sm-12" name="imageRow">
+            <!-- I M A G E -->
+            <div ng-init="image_reloader(timer=2000,src='img.jpg')">
+                <p>Image updated via url [{{my_image_url}}]</p>
+                <img ng-src="{{image_url}}" height="100" width="100"/>
+            </div>
+        </div> <!-- image row -->
 
-        <div ng-init="image_reloader(timer=2000,src='img.jpg')">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <img ng-src="{{image_url}}" height="100" width="100"></img>
-        </div>
-
-        <div>
+        <div class="row" name="emptySpacerRow">
             &nbsp;
+        </div> <!-- empty spacer row -->
+
+        <form class="form-inline">
+            <div class="form-group">
+                <input type="button" value="F" id="Fit" data-ng-click="f_moveClick('F')">
+            </div>
+
+        </form>
+
+        <div class="row" >
+
+            <div class="col-sm-1 btn-group">
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">L</button>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="col-sm-1 btn-group">
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">FL</button>
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">BL</button>
+                <p>&nbsp;</p>
+            </div>
+            <div class="col-sm-1 btn-group">
+                <button type="button" class="btn btn-default">F</button>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">B</button>
+            </div>
+            <div class="col-sm-1 btn-group">
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">FR</button>
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">BR</button>
+                <p>&nbsp;</p>
+            </div>
+            <div class="col-sm-1 btn-group">
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <button type="button" class="btn btn-default">R</button>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+            </div>
+            <div class="col-sm-1 btn-group">
+                <button type="button" class="btn btn-default">Oohmph</button>
+                <button type="button" class="btn btn-default">Oohmph</button>
+                <button type="button" class="btn btn-default">Oohmph</button>
+                <button type="button" class="btn btn-default">Oohmph</button>
+                <button type="button" class="btn btn-default">Oohmph</button>
+            </div>
         </div>
+
+
+
+
+
 
         <!-- B U T T O N S -->
-        <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="button" value="FL" id="FL" data-ng-click="f_moveClick('FL')">
-            &nbsp;&nbsp;
-            <input type="button" value=" F " id="F" data-ng-click="f_moveClick('F')">
-            &nbsp;&nbsp;
-            <input type="button" value="FR" id="FR" data-ng-click="f_moveClick('FR')">
 
-        </div>
-        <div>
-            <input type="button" value="FLL" id="FLL" data-ng-click="f_moveClick('FLL')">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <!--
+            <div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="button" value="FL" id="FL" data-ng-click="f_moveClick('FL')">
+                &nbsp;&nbsp;
+                <input type="button" value=" F " id="F" data-ng-click="f_moveClick('F')">
+                &nbsp;&nbsp;
+                <input type="button" value="FR" id="FR" data-ng-click="f_moveClick('FR')">
 
-            <input type="button" value="FRR" id="FRR" data-ng-click="f_moveClick('FRR')">
+            </div>
+            <div>
+                <input type="button" value="FLL" id="FLL" data-ng-click="f_moveClick('FLL')">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-        </div>
-        <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="L" id="L" data-ng-click="f_moveClick('L')">
-            <input type="button" value="B R A K E" id="BRAKE" data-ng-click="f_moveClick('BRAKE')">
-            <input type="button" value="R" id="R" data-ng-click="f_moveClick('R')">
+                <input type="button" value="FRR" id="FRR" data-ng-click="f_moveClick('FRR')">
 
-        </div>
-        <div>
-            <input type="button" value="BLL" id="BLL" data-ng-click="f_moveClick('BLL')">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="L" id="L" data-ng-click="f_moveClick('L')">
+                <input type="button" value="B R A K E" id="BRAKE" data-ng-click="f_moveClick('BRAKE')">
+                <input type="button" value="R" id="R" data-ng-click="f_moveClick('R')">
 
-            <input type="button" value="BRR" id="BRR" data-ng-click="f_moveClick('BRR')">
+            </div>
+            <div>
+                <input type="button" value="BLL" id="BLL" data-ng-click="f_moveClick('BLL')">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-        </div>
-        <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="BL" id="BL" data-ng-click="f_moveClick('BL')">
-            &nbsp;&nbsp;
-            <input type="button" value=" B " id="B" data-ng-click="f_moveClick('B')">
-            &nbsp;&nbsp;
-            <input type="button" value="BR" id="BR" data-ng-click="f_moveClick('BR')">
-        </div>
-        <div>&nbsp;</div>
-         <div>&nbsp;</div>
-        <div>&nbsp;</div>
+                <input type="button" value="BRR" id="BRR" data-ng-click="f_moveClick('BRR')">
 
+            </div>
+            <div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="BL" id="BL" data-ng-click="f_moveClick('BL')">
+                &nbsp;&nbsp;
+                <input type="button" value=" B " id="B" data-ng-click="f_moveClick('B')">
+                &nbsp;&nbsp;
+                <input type="button" value="BR" id="BR" data-ng-click="f_moveClick('BR')">
+            </div>
+            <div>&nbsp;</div>
+             <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            -->
+        </div> <!-- buttons row -->
 
         <!-- DEBUG AREA -->
         <hr/>

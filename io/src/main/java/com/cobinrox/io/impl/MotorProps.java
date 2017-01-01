@@ -22,6 +22,17 @@ public class MotorProps {
 	public static int    m2_PLUS_GPIO_PIN; public static final String M2_PLUS_GPIO_PIN  = "M2_PLUS_GPIO_PIN";
     public static short  usb_ID_VENDOR;    public static final String USB_ID_VENDOR     = "USB_ID_VENDOR";
     public static short  usb_ID_PRODUCT;   public static final String USB_ID_PRODUCT    = "USB_ID_PRODUCT";
+
+    /**
+     * For saber board, this value represents the value that we normally send to the motor to move, it can
+     * be a value from 0 to 2047, where the lower the absolute value, the less voltage and strength
+     * is applied to the motors, so to give the motor more oopmph, you could set this value to a higher
+     * number.  This number is used to move either forward or backward, although going backward on wheelchair
+     * sometimes needs more oomph, so we might want to provide both a forward and backward volt strength
+     * value.
+     * This value, by the way, is similar to the pulse mode params that are used for the GPIO motor control, it's
+     * just that the saber board is much easier to control
+     */
     public static int    usb_USB_VOLT_STRENGTH;    public static final String USB_VOLT_STRENGTH_PROP = "USB_VOLT_STRENGTH";
 
 	public static int    m1_cmd_run_time_ms; public static final String M1_CMD_RUN_TIME_MS_PROP  = "M1_CMD_RUN_TIME_MS";

@@ -7,7 +7,7 @@
 //            also be defined in the corresponding HTML file using this JS module
 // ngMessages: prints messages to the document
 // ngResource: provides http getter
-var myApp = angular.module('myApp', ['ngMessages','ngResource']);
+var egorApp = angular.module('egorApp', ['ngMessages','ngResource']);
 
 // Controller
 // @param name for controller
@@ -21,9 +21,9 @@ var myApp = angular.module('myApp', ['ngMessages','ngResource']);
 // @param timeout injected by angular, timer capability
 //
 //
-myApp.controller('mainController', ['$scope','$log','$filter','$resource','$http','$timeout',
+egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$http','$timeout',
     function($scope, $log, $filter,$resource,$http,$timeout) {
-        $log.info("In mainController!");
+        $log.info("In egorController!");
         //console.log("In mainController but using non-angular log!");
         $scope.g_projectName = $filter('uppercase')('Egor Project');
         
@@ -105,10 +105,20 @@ myApp.controller('mainController', ['$scope','$log','$filter','$resource','$http
                 // add a hash tag to fake out new url to force refresh of a file with the same name,
                 // but which may have changed content back on the server
                 // well hash tag does not work but question mark does seem to work
-                $scope.image_url = 'http://' + location.host + '/rap-web/img.jpg' + '?' + new Date().getTime();
-                mytimeout = $timeout($scope.onTimeout,4000);
+                //$scope.image_url = 'http://' + location.host + '/rap-web/img.jpg' + '?' + new Date().getTime();
+                var mywebctx = location.pathname;
+                var webIdx = mywebctx.indexOf('rap-web');
+                mywebctx = location.pathname.substr(0,webIdx+'rap-web'.length);
+                console.log("mywebct: " + mywebctx);
+                $scope.my_image_url = 'http://' + location.host + mywebctx + '/img.jpg' + '#' + new Date().getTime();
+
+                //var lastSlash = location.pathname.lastIndexOf("/");
+                //var webCtx = location.pathname.substr(0,lastSlash);
+                //$log.info("my webcontext: " + webCtx);
+                //$scope.my_image_url = 'http://' + location.host + webCtx + '/img.jpg' + '#' + new Date().getTime();
+                mytimeout = $timeout($scope.onTimeout,2000);
             }
-            var mytimeout = $timeout($scope.onTimeout,4000);
+            var mytimeout = $timeout($scope.onTimeout,2000);
 
             $scope.stop = function(){
                 $timeout.cancel(mytimeout);

@@ -25,6 +25,17 @@ public class Usb4jMotorControl implements IMotor {
     public int numFinishedCmds;
     int numCmdsToExpect;
 
+    /**
+     * For saber, the USB handle to the saber device is shared between motors,
+     * so is set as static
+     */
+    static DeviceHandle usbHandle;
+
+    /**
+     * Endpoint for the saber USB port, should prolly put in props file
+     */
+    byte USB_OUTPUT_ENDPOINT = 2;
+
     MotorProps mp;
     public Usb4jMotorControl(String alias) {
         this.alias = alias;
@@ -49,7 +60,7 @@ public class Usb4jMotorControl implements IMotor {
 
 
     /**
-     * Creates a new thread on which to send motor commands, then returns.
+     * Creates and starts a new thread on which to send motor commands, then returns.
      * New thread then runs autonomously, until it sends all the sub commands (if running in spurt mode),
      * an error is encountered, or the ebrake flag is set.  If running in continuous mode, the thread
      * continues to run until the ebrake flag is set.
@@ -63,7 +74,6 @@ public class Usb4jMotorControl implements IMotor {
         Thread thrd = new Thread() {
             public void run() {
                 next_subcmd:
-                //for(int subCmdIdx = 0; subCmdIdx < subCmds.size(); subCmdIdx++) {
                 for(String subCmd: subCmds) { // = 0; subCmdIdx < subCmds.size(); subCmdIdx++) {
                     if(ebrake)
                     {
@@ -74,13 +84,18 @@ public class Usb4jMotorControl implements IMotor {
                     }
                     if( subCmd.startsWith("'"))
                     {
+                        // if subcommand is embedded in single quotes (e.g. 'R:512') then just send the
+                        // command as-is, don't do any pulsing logic
                         try {
                             lowLevelSend(subCmd.substring(1,subCmd.length()-1));
                         }catch(Throwable t){logger.error("Sending command",t);}
                         continue next_subcmd;
                     }
                     else {
-                        //String[]thisCmd = subCmds.get(subCmdIdx).split(",");
+                        // else, assume subcommand is normal motor movement type command and do use pulsing/timing
+                        // logic
+                        // subcommand is set up something like this: +,1 or -,5
+                        // i.e. a +/- direction char followed by time value, usually just a value of 1
                         String[] thisCmd = subCmd.split(",");
                         String plusOrMinusDirChar = thisCmd[0];
 
@@ -91,12 +106,9 @@ public class Usb4jMotorControl implements IMotor {
                         setName(alias + plusOrMinusDirChar);
                         try {
                             int numPeriods = (int) ((float) cmd_run_time_ms / ((float) numMsHi + (float) numMsLo));
-                            //logger.info("     Pulsing [" + plusOrMinusDirChar +"], need [" + numPeriods + "] pulses across ["
-                            //        + cmd_run_time_ms + "] ms ...");
                             logger.info("     Pulsing [" + plusOrMinusDirChar + "], pulses across ["
                                     + cmd_run_time_ms + "] ms ...");
                             long elapsedTime = cmd_run_time_ms;
-                            //for (int i = 0; i < numPeriods; i++)
                             while (elapsedTime > 0) {
                                 long startPulseAt = System.currentTimeMillis();
                                 if (ebrake) {
@@ -106,7 +118,6 @@ public class Usb4jMotorControl implements IMotor {
                                     return;
                                 }
                                 logger.info("     turning on for [" + numMsHi + "]ms...");
-                                //lowLevelPulse(plusOrMinusDirChar, t);
                                 lowLevelPulse(plusOrMinusDirChar, mp.usb_USB_VOLT_STRENGTH);
                                 Thread.sleep(numMsHi);
 
@@ -127,7 +138,8 @@ public class Usb4jMotorControl implements IMotor {
                                     + (outerStop - outerStart) + " ms");
                         }
 
-                        logger.debug("     (bumping numFinishedCmds from " + numFinishedCmds + ")");
+                        logger.debug("     (bumping numFinishedCmds from " + numFinishedCmds + " to " +
+                                (numFinishedCmds+1) + ")");
                         numFinishedCmds++;
                     }
                 } // end for subcommand
@@ -162,24 +174,26 @@ public class Usb4jMotorControl implements IMotor {
                 (plusOrMinusDirChar.equals("+") ?
                         "" + speed
                         :
-                        "-" + speed) +
-                "\r\n";
+                        "-" + speed
+                ) ;
         g_debugStatusString = alias + plusOrMinusDirChar;
         lowLevelSend(gCmd);
     }
 
 
     private void lowLevelSend(final String cmd) throws Throwable {
+
         logger.debug("Sending cmd [" + cmd + "]");
         if (!mp.simulate_pi) {
-            ByteBuffer buffer = ByteBuffer.allocateDirect(cmd.length());
-            buffer.put(cmd.getBytes());
+            // for saber, need to also append cr/lf, 2 more chars
+            ByteBuffer buffer = ByteBuffer.allocateDirect(cmd.length()+2);
+            buffer.put((cmd+"\r\n").getBytes());
             buffer.rewind();
 
             Transfer transfer = LibUsb.allocTransfer();
-            byte OUT_ENDPOINT = 2;
+
             IntBuffer transferred = BufferUtils.allocateIntBuffer();
-            int result = LibUsb.bulkTransfer(myHandle, OUT_ENDPOINT, buffer,
+            int result = LibUsb.bulkTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer,
                     transferred, 5000);
             if (result != LibUsb.SUCCESS)
             {
@@ -192,43 +206,9 @@ public class Usb4jMotorControl implements IMotor {
     private void lowLevelStop(final String plusOrMinusDirChar, final float notUsed) throws Throwable {
         lowLevelPulse(plusOrMinusDirChar, 0);
     }
-    /*
-        logger.debug("          low level stop request [" +alias + plusOrMinusDirChar + "]"  );
-        Process p = null;
-        gCmd = null;
-        gCmd = alias+":0";
 
-        g_debugStatusString = alias.toLowerCase() + plusOrMinusDirChar;
-        //if (g_debugStatusThread == null ){ runDebugStatusThread(); if(g_debugStatusThread != null) g_debugStatusThread.start();}
-
-        String pulseOffCmd = gCmd;
-        logger.debug("          Sending cmd [" + pulseOffCmd + "]");
-        if (!mp.simulate_pi) {
-            ByteBuffer buffer = ByteBuffer.allocateDirect(pulseOffCmd.length());
-            buffer.put(pulseOffCmd.getBytes());
-            buffer.rewind();
-            Transfer transfer = LibUsb.allocTransfer();
-            byte OUT_ENDPOINT = 2;
-            LibUsb.fillBulkTransfer(transfer, myHandle, OUT_ENDPOINT, buffer,
-                    null, null, 1000);
-            //System.out.println("Sending " + data.length + " bytes to device");
-            int result = LibUsb.submitTransfer(transfer);
-            if (result != LibUsb.SUCCESS)
-            {
-                throw new LibUsbException("Unable to submit transfer", result);
-            }
-            //Transfer t = new Transfer(buffer);
-            //LibUsb.controlTransferGetData()
-            //int transfered = LibUsb.controlTransfer(myHandle,
-            //        (byte) (LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE),
-            //        (byte) 0x6d, (byte) 0x31, (byte) 0x3a, buffer, 1000);
-
-        }
-    }
-    */
-    static DeviceHandle myHandle;
     public void hwInit() throws Throwable{
-        if(myHandle != null)
+        if(usbHandle != null)
         {
             System.out.println("Handle already gotten");
             return;
@@ -253,11 +233,11 @@ public class Usb4jMotorControl implements IMotor {
             handle = dumpDevice(device);
             if(handle != null)
             {
-                myHandle = handle;
+                usbHandle = handle;
                 break;
             }
         }
-        if( myHandle == null)
+        if( usbHandle == null)
         {
             throw new IOException("Could not find USB Motor Driver with Product/Vendor ID [" + mp.usb_ID_PRODUCT + "/" + mp.usb_ID_VENDOR);
         }
