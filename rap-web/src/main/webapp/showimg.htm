@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-us" ng-app="showImgApp">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta charset="UTF-8">
+
+    <!-- load angular  -->
+    <script src="js/angular.js"></script>
+    <script src="js/angular-messages.min.js"></script>
+    <script src="js/angular-resource.min.js"></script>
+
+    <!-- load our stuff -->
+    <script src="js/showImgApp.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div ng-controller="showImgController">
+        <p>(Use Ctrl-Shift-J to view console on Chrome)</p>
+        <p>(Use F12 to view console on IE)</p>
+        <hr/>
+        <!-- Static Image -->
+        <p>This is just a static html image tag</p>
+        <img src="img.jpg" height="100" width="100"/>
+
+        <!-- Timed Image -->
+        <p>This image should update every 4 seconds using url [{{my_image_url}}]</p>
+        <div ng-init="my_image_reloader(timer=4000,src='img.jpg')">
+            <img ng-src="{{my_image_url}}" height="100" width="100"/>
+        </div>
+
+    </div> <!-- controller -->
+</div> <!-- container -->
+</body>
+</html>

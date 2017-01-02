@@ -1,0 +1,19 @@
+to install use:
+sudo apt-get update
+sudo apt-get upgrade (optional)
+sudo apt-get install tomcat8
+
+installs at:
+/var/lib/tomcatX
+/usr/share/tomcatX/bin
+
+edit as root /etc/tomcatX/tomcat-users.xml file, adding to tomcat-users section:
+<user username="me" password="mypassword" roles="manager-gui,admin-gui"/>
+
+restart tomcat:
+sudo service tomcatX restart
+
+copy your war directory/file to
+/var/lib/tomcatX/webapps/yourwarhere
+
+

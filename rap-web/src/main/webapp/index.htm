@@ -7,18 +7,28 @@
 
     <!-- load bootstrap and fontawesome -->
     <link rel="stylesheet" href="js/bs335/css/bootstrap.min.css" />
-    <style>
+    <!--style>
         html, body, input, select, textarea
         {
             font-size: 1.05em;
         }
-    </style>
+    </style-->
+    <!-- jquery -->
+    <script src="js/jq/jq1.js"></script>
+    <script src="js/jq/jq2.js"></script>
+
+    <!-- circular navigation, spinner, and radio/check box-->
+    <link rel="stylesheet" type="text/css" href="css/circle.css"/>
+    <link rel="stylesheet" type="text/css" href="js/ns/bootstrap-touchspin.min.css"/>
+    <link rel="stylesheet" type="text/css" href="js/fr/fr.css"/>
+    <script src="js/ns/bootstrap-touchspin.min.js"></script>
 
     <!-- load angular  -->
     <script src="js/angular.js"></script>
     <script src="js/angular-messages.min.js"></script>
     <script src="js/angular-resource.min.js"></script>
-    <!-- load our stuff -->
+
+    <!-- load egor stuff -->
     <script src="js/egorApp.js"></script>
 
 
@@ -26,7 +36,7 @@
 <body>
 
 <header>
-    <nav class="navbar navbar-default">
+    <!--nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/">EgorProject</a>
@@ -37,12 +47,12 @@
                 <li><a href="#"><i class="fa fa-settings"></i> Settings</a></li>
             </ul>
         </div>
-    </nav>
+    </nav-->
 </header>
 
 <div class="container">
 
-    <!-- Connect this div to the back end egor JS app's controller -->
+    <!-- Connects this div to the back-end egor JS app's controller -->
     <div class="container text-center"  ng-controller="egorController">
         <!-- double handlebar moustaches bind the backend $scope global vars defined in the AJS app file -->
         <!-- you could think of this as egorApp.egorController.g_projectName in a java program -->
@@ -62,112 +72,79 @@
             &nbsp;
         </div> <!-- empty spacer row -->
 
-        <form class="form-inline">
-            <div class="form-group">
-                <input type="button" value="F" id="Fit" data-ng-click="f_moveClick('F')">
+
+        <div class="row">
+            <div class="col-md-6 col-sm-6">
+
+                <div class="panel panel-default"  >
+                    <div class="panel-heading">Navigation Panel</div>
+                    <div class="panel-body">
+
+                            <!--section-->
+                        <div class='circle-container'>
+                            <a href='#' class='center'><input type="button" value=" BRAKE " id="S" data-ng-click="f_moveClick('S')"></a>
+                            <a href='#' class='deg0'><input type="button" value=" R " id="R" data-ng-click="f_moveClick('R')"></a>
+                            <a href='#' class='deg45'><input type="button" value=" BR " id="BR" data-ng-click="f_moveClick('BR')"></a>
+                            <a href='#' class='deg90'><input type="button" value=" B " id="B" data-ng-click="f_moveClick('B')"></a>
+
+                            <a href='#' class='deg135'><input type="button" value=" BL " id="BL" data-ng-click="f_moveClick('BL')"></a>
+                            <a href='#' class='deg180'><input type="button" value=" L " id="L" data-ng-click="f_moveClick('L')"></a>
+                            <a href='#' class='deg225'><input type="button" value=" FL " id="FL" data-ng-click="f_moveClick('FL')"></a>
+                            <a href='#' class='deg270'><input type="button" value=" F " id="F" data-ng-click="f_moveClick('F')"></a>
+                            <a href='#' class='deg315'><input type="button" value=" FR " id="FR" data-ng-click="f_moveClick('FR')"></a>
+                        </div>
+
+                        <!--/section-->
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Settings</div>
+                    <div class="panel-body">
+                        <div>
+                            Oomph (voltage):
+                            <div class="input-group number-spinner">
+                            <span class="input-group-btn data-dwn">
+                                <button class="btn btn-default btn-info" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
+                            </span>
+                                <input type="text" class="form-control text-center" value="512" min="0" max="2047">
+                            <span class="input-group-btn data-up">
+                                <button class="btn btn-default btn-info" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
+                            </span>
+                            </div>
+                        </div>
+                        <div>
+                            Smoothness (ramp):
+                            <div class="input-group number-spinner">
+                            <span class="input-group-btn data-dwn">
+                                <button class="btn btn-default btn-info" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
+                            </span>
+                                <input type="text" class="form-control text-center" value="512" min="0" max="2047">
+                            <span class="input-group-btn data-up">
+                                <button class="btn btn-default btn-info" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
+                            </span>
+                            </div>
+                        </div>
+                        <!--div class="row"-->
+                        <div class="funkyradio">
+                            <div class="funkyradio-primary">
+                                <input type="radio" name="radio" id="radio1" checked/>
+                                <label for="radio1">Spurt Mode (digital)</label>
+                            </div>
+                            <div class="funkyradio-primary">
+                                <input type="radio" name="radio" id="radio2" />
+                                <label for="radio2">Continuous Mode (analog)</label>
+                            </div>
+                        </div>
+                        <!--/div-->
+                        <button type="button" class="btn btn-primary btn-block">Apply</button>
+                    </div>
+                </div>
             </div>
 
-        </form>
-
-        <div class="row" >
-
-            <div class="col-sm-1 btn-group">
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">L</button>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-            </div>
-            <div class="col-sm-1 btn-group">
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">FL</button>
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">BL</button>
-                <p>&nbsp;</p>
-            </div>
-            <div class="col-sm-1 btn-group">
-                <button type="button" class="btn btn-default">F</button>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">B</button>
-            </div>
-            <div class="col-sm-1 btn-group">
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">FR</button>
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">BR</button>
-                <p>&nbsp;</p>
-            </div>
-            <div class="col-sm-1 btn-group">
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <button type="button" class="btn btn-default">R</button>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-            </div>
-            <div class="col-sm-1 btn-group">
-                <button type="button" class="btn btn-default">Oohmph</button>
-                <button type="button" class="btn btn-default">Oohmph</button>
-                <button type="button" class="btn btn-default">Oohmph</button>
-                <button type="button" class="btn btn-default">Oohmph</button>
-                <button type="button" class="btn btn-default">Oohmph</button>
-            </div>
         </div>
 
-
-
-
-
-
-        <!-- B U T T O N S -->
-
-            <!--
-            <div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type="button" value="FL" id="FL" data-ng-click="f_moveClick('FL')">
-                &nbsp;&nbsp;
-                <input type="button" value=" F " id="F" data-ng-click="f_moveClick('F')">
-                &nbsp;&nbsp;
-                <input type="button" value="FR" id="FR" data-ng-click="f_moveClick('FR')">
-
-            </div>
-            <div>
-                <input type="button" value="FLL" id="FLL" data-ng-click="f_moveClick('FLL')">
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                <input type="button" value="FRR" id="FRR" data-ng-click="f_moveClick('FRR')">
-
-            </div>
-            <div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="L" id="L" data-ng-click="f_moveClick('L')">
-                <input type="button" value="B R A K E" id="BRAKE" data-ng-click="f_moveClick('BRAKE')">
-                <input type="button" value="R" id="R" data-ng-click="f_moveClick('R')">
-
-            </div>
-            <div>
-                <input type="button" value="BLL" id="BLL" data-ng-click="f_moveClick('BLL')">
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                <input type="button" value="BRR" id="BRR" data-ng-click="f_moveClick('BRR')">
-
-            </div>
-            <div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="BL" id="BL" data-ng-click="f_moveClick('BL')">
-                &nbsp;&nbsp;
-                <input type="button" value=" B " id="B" data-ng-click="f_moveClick('B')">
-                &nbsp;&nbsp;
-                <input type="button" value="BR" id="BR" data-ng-click="f_moveClick('BR')">
-            </div>
-            <div>&nbsp;</div>
-             <div>&nbsp;</div>
-            <div>&nbsp;</div>
-            -->
-        </div> <!-- buttons row -->
 
         <!-- DEBUG AREA -->
         <hr/>
