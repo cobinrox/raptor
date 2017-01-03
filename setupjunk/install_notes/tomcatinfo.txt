@@ -3,17 +3,24 @@ sudo apt-get update
 sudo apt-get upgrade (optional)
 sudo apt-get install tomcat8
 
-installs at:
+creates user tomcatX and installs at:
 /var/lib/tomcatX
 /usr/share/tomcatX/bin
 
 edit as root /etc/tomcatX/tomcat-users.xml file, adding to tomcat-users section:
 <user username="me" password="mypassword" roles="manager-gui,admin-gui"/>
+ 
+edit as root /etc/default/tomcat8 and set the TOMCATX_USER and GROUP as
+root
+(to allow access to USB port)
 
 restart tomcat:
 sudo service tomcatX restart
 
 copy your war directory/file to
 /var/lib/tomcatX/webapps/yourwarhere
+
+log files will appear at:
+/var/lib/tomcat8/logs
 
 
