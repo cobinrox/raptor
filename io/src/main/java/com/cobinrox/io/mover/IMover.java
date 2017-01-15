@@ -10,5 +10,6 @@ public interface IMover
    public String move(String uiCmd);
    public String dataChanged(String key, String val);
    public void shutdown();
+   public void setEbrake(boolean e);
 }
    

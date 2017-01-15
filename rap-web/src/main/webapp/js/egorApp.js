@@ -31,6 +31,12 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
 
         $scope.g_moveCmd = '';
 
+        $scope.g_volts = 512;
+        $scope.g_ramp  = 512;
+        $scope.g_vr_min = 0;
+        $scope.g_vr_max = 2047;
+        $scope.g_vr_step = 512/4;
+
         $scope.g_audioFileName = '';
         $scope.g_moveResponse = '';
         $scope.g_httpResponseData = '';
@@ -94,43 +100,72 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
         };
 
         //
-        // Timer to refresh image file every xx seconds
+        // Handle one of the spin button clilcks
         //
-        $scope.image_reloader = function(timer,url){
-            $log.info("IMAGE RELOADER");
-            $scope.counter = 0;
-            $scope.onTimeout = function(){
-                $scope.counter++;
-                $log.info($scope.counter + " " + "timer" + location.host);
-                // add a hash tag to fake out new url to force refresh of a file with the same name,
-                // but which may have changed content back on the server
-                // well hash tag does not work but question mark does seem to work
-                //$scope.image_url = 'http://' + location.host + '/rap-web/img.jpg' + '?' + new Date().getTime();
-                var mywebctx = location.pathname;
-                var webIdx = mywebctx.indexOf('rap-web');
-                mywebctx = location.pathname.substr(0,webIdx+'rap-web'.length);
-                console.log("mywebct: " + mywebctx);
-                $scope.my_image_url = 'http://' + location.host + mywebctx + '/img.jpg' + '#' + new Date().getTime();
+        $scope.f_changeValClick = function(l_val_direction)
+        {
+            $log.info(l_val_direction.valueOf());
+            if (l_val_direction.valueOf() == 'D_AVG_UP')
+            {
+                if( $scope.g_volts == $scope.g_vr_max) return;
+                if(! $scope.g_volts < $scope.g_vr_max &&
+                     $scope.g_volts+$scope.g_vr_step <= $scope.g_vr_max) {
+                    $scope.g_volts += $scope.g_vr_step;
 
-                //var lastSlash = location.pathname.lastIndexOf("/");
-                //var webCtx = location.pathname.substr(0,lastSlash);
-                //$log.info("my webcontext: " + webCtx);
-                //$scope.my_image_url = 'http://' + location.host + webCtx + '/img.jpg' + '#' + new Date().getTime();
-                mytimeout = $timeout($scope.onTimeout,2000);
+                }
+                else
+                {
+                    $scope.g_volts = $scope.g_vr_max;
+                }
+                f_sendMoveCmd('D_AVG_' + $scope.g_volts);
             }
-            var mytimeout = $timeout($scope.onTimeout,2000);
+            else if (l_val_direction.valueOf() == 'D_AVG_DOWN')
+            {
+                if($scope.g_volts == $scope_g_vr_min) return;
+                if(! $scope.g_volts > $scope.g_vr_min &&
+                    $scope.g_volts-$scope.g_vr_step >= $scope.g_vr_min) {
+                    $scope.g_volts -= $scope.g_vr_step;
 
-            $scope.stop = function(){
-                $timeout.cancel(mytimeout);
+                }
+                else
+                {
+                    $scope.g_volts = $scope.g_vr_min;
+                }
+                f_sendMoveCmd('D_AVG_' + $scope.g_volts);
             }
-        };
+            if (l_val_direction.valueOf() == 'D_RAMP_UP')
+            {
+                if( $scope.g_ramp == $scope.g_vr_max) return;
+                if(! $scope.g_ramp < $scope.g_vr_max &&
+                    $scope.g_ramp+$scope.g_vr_step <= $scope.g_vr_max) {
+                    $scope.g_ramp += $scope.g_vr_step;
 
+                }
+                else
+                {
+                    $scope.g_ramp = $scope.g_vr_max;
+                }
+                f_sendMoveCmd('D_RAMP_' + $scope.g_ramp);
+            }
+            else if (l_val_direction.valueOf() == 'D_RAMP_DOWN')
+            {
+                if( $scope.g_ramp == $scope.g_vr_min) return;
+                if(! $scope.g_ramp > $scope.g_vr_min &&
+                    $scope.g_ramp-$scope.g_vr_step >= $scope.g_vr_min) {
+                    $scope.g_ramp -= $scope.g_vr_step;
+                }
+                else
+                {
+                    $scope.g_ramp = $scope.g_vr_min;
+                }
+                f_sendMoveCmd('D_RAMP_' + $scope.g_ramp);
+            }
+        }
         //
         // low-level function to contact back-end motor command servlet
         //
         f_sendMoveCmd = function(l_moveCmd)
         {
-
             var urlStr = 'servlets/EgorServlet';
             $log.info("sending GET to [" + urlStr + "]/with param [" + l_moveCmd + "]");
             $http({
@@ -184,4 +219,36 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
 
             });
         };
+        //
+        // Timer to refresh image file every xx seconds
+        //
+        $scope.image_reloader = function(timer,url){
+            $log.info("IMAGE RELOADER");
+            $scope.counter = 0;
+            $scope.onTimeout = function(){
+                $scope.counter++;
+                $log.info($scope.counter + " " + "timer" + location.host);
+                // add a hash tag to fake out new url to force refresh of a file with the same name,
+                // but which may have changed content back on the server
+                // well hash tag does not work but question mark does seem to work
+                //$scope.image_url = 'http://' + location.host + '/rap-web/img.jpg' + '?' + new Date().getTime();
+                var mywebctx = location.pathname;
+                var webIdx = mywebctx.indexOf('rap-web');
+                mywebctx = location.pathname.substr(0,webIdx+'rap-web'.length);
+                //console.log("mywebct: " + mywebctx);
+                $scope.my_image_url = 'http://' + location.host + mywebctx + '/img.jpg' + '#' + new Date().getTime();
+
+                //var lastSlash = location.pathname.lastIndexOf("/");
+                //var webCtx = location.pathname.substr(0,lastSlash);
+                //$log.info("my webcontext: " + webCtx);
+                //$scope.my_image_url = 'http://' + location.host + webCtx + '/img.jpg' + '#' + new Date().getTime();
+                mytimeout = $timeout($scope.onTimeout,2000);
+            }
+            var mytimeout = $timeout($scope.onTimeout,2000);
+
+            $scope.stop = function(){
+                $timeout.cancel(mytimeout);
+            }
+        };
+
     }]);

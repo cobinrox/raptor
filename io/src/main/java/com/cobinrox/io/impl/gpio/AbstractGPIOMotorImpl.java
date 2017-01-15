@@ -29,6 +29,8 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
         ebrake = brake;
         logger.info("**** EBRAKE REQUESTED ****");
     }
+    @Override
+    public boolean getEbrake(){ return ebrake;}
     /*
     public void reInitCycleLens(long hiCycleLenMs, long lowCycleLenMs, long totalCmdLenMs) {
         //this.hiCycleLenMs = hiCycleLenMs;

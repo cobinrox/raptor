@@ -22,6 +22,19 @@ public class WheelChairMoverImpl implements IMover
    //
    //HashMap<String,List< List<String>> uiCmdToMotorCmds;
 
+   @Override
+   public void setEbrake(boolean e)
+   {
+      if(m1 != null)m1.setEbrake(true);
+      if(m2 != null)m2.setEbrake(true);
+      if( e )
+      {
+         logger.error("******* EBRAKE REQUESTED **********");
+         m1.setEbrake(e);
+         m2.setEbrake(e);
+         move("E");
+      }
+   }
    public void init(MotorProps mp) throws Throwable
    {
       this.mp = mp;
@@ -82,58 +95,84 @@ public class WheelChairMoverImpl implements IMover
    }
    public String move(String uiCmd)
    {
-      // get cmds that we need to run for uiCmd the  provided by caller (usually a user)
-      // examle, if uiCmd is "F", then we'll get something like
-      // +1 for m1 and +1 for m2 which means pulse M1 (the left motor) once and
-      // pulse M2 (the right motor) once
-      //
-      List<String> m1Cmds = (List<String>)mp.m1_cmds_to_dts.get(uiCmd);
-      List<String> m2Cmds = (List<String>)mp.m2_cmds_to_dts.get(uiCmd);
-
-      if( m1Cmds != null && m1Cmds.size()>0) {
-         m1.setExpectedNumCmds(m1Cmds.size());
-         // motors get done finished
-         logger.debug("Request nonBtlockingPulse(s) to M1...");
-         m1.nonBlockingPulse(m1Cmds,mp.m1_cmd_run_time_ms, mp.m1_duty_cycle_hi_ms,mp.m1_duty_cycle_lo_ms);
-      }
-      if( m2Cmds != null && m2Cmds.size()>0) {
-         m2.setExpectedNumCmds(m2Cmds.size());
-         logger.debug("Request nonBlockingPulse(s) to M2...");
-         m2.nonBlockingPulse(m2Cmds,mp.m2_cmd_run_time_ms, mp.m2_duty_cycle_hi_ms,mp.m2_duty_cycle_lo_ms);
-      }
-
-      // if running in continuous mode, just return
-      if( mp.motor_run_mode.equalsIgnoreCase(MotorProps.MOTOR_RUN_MODE_CONTINUOUS))
+      if( uiCmd.equalsIgnoreCase("E") | uiCmd.equalsIgnoreCase("ebrake")| uiCmd.equalsIgnoreCase("brake"))
       {
-         logger.info("Motors commanded, send Ebrake to stop");
-         return "Motors commanded, send Ebrake to stop";
+         m1.setEbrake(true);
+         m2.setEbrake(true);
       }
-      // else if running in spurt mode, then wait for the commands to finish
-      if( m1Cmds != null && m1Cmds.size()>0) {
-
-         while (m1.getNumFinishedCommands() < m1Cmds.size()) {
-            try {
-               Thread.sleep(50);
-            } catch (Throwable t) {
-            }
-         }
-         logger.debug("done/w M1");
-         m1.brakeAll();
+      else if( uiCmd.equalsIgnoreCase("C") | uiCmd.equalsIgnoreCase("clear"))
+      {
+         m1.setEbrake(false);
+         m2.setEbrake(false);
       }
-      if( m2Cmds != null && m2Cmds.size()>0) {
+      else {
+         // get cmds that we need to run for uiCmd the  provided by caller (usually a user)
+         // examle, if uiCmd is "F", then we'll get something like
+         // +1 for m1 and +1 for m2 which means pulse M1 (the left motor) once and
+         // pulse M2 (the right motor) once
+         //
+         List<String> m1Cmds = (List<String>) mp.m1_cmds_to_dts.get(uiCmd);
+         List<String> m2Cmds = (List<String>) mp.m2_cmds_to_dts.get(uiCmd);
 
-         while (m2.getNumFinishedCommands() < m2Cmds.size()) {
-            try {
-               Thread.sleep(50);
-            } catch (Throwable t) {
-            }
+         if (m1Cmds != null && m1Cmds.size() > 0) {
+            m1.setExpectedNumCmds(m1Cmds.size());
+            // motors get done finished
+            logger.debug("Request nonBtlockingPulse(s) to M1...");
+            m1.nonBlockingPulse(m1Cmds, mp.m1_cmd_run_time_ms, mp.m1_duty_cycle_hi_ms, mp.m1_duty_cycle_lo_ms);
          }
-         logger.debug("done/w M2");
-         m2.brakeAll();
+         if (m2Cmds != null && m2Cmds.size() > 0) {
+            m2.setExpectedNumCmds(m2Cmds.size());
+            logger.debug("Request nonBlockingPulse(s) to M2...");
+            m2.nonBlockingPulse(m2Cmds, mp.m2_cmd_run_time_ms, mp.m2_duty_cycle_hi_ms, mp.m2_duty_cycle_lo_ms);
+         }
+boolean isRead = false;
+         // major hacke check for read
+         if( m1Cmds != null && m1Cmds.size() > 0 )
+         {
+            if( m1Cmds.get(0).contains("get"))
+               isRead = true;
+         }
+         // if running in continuous mode, just return
+         if (mp.motor_run_mode.equalsIgnoreCase(MotorProps.MOTOR_RUN_MODE_CONTINUOUS) && !isRead) {
+            logger.info("Motors commanded, send Ebrake to stop");
+            return "Motors commanded, send Ebrake to stop";
+         }
+         // else if running in spurt mode, then wait for the commands to finish
+         if (m1Cmds != null && m1Cmds.size() > 0) {
+
+            while (m1.getNumFinishedCommands() < m1Cmds.size() && !m1.getEbrake()) {
+               try {
+                  Thread.sleep(50);
+               } catch (Throwable t) {
+                  logger.error("UNEXPECTED ERROR DURING SLEEP", t);
+                  break;
+               }
+            }
+            logger.debug("done/w M1");
+            if(isRead)
+            {
+               String x = ((Usb4jMotorControl)m1).read(7,5000);
+               logger.info("read from motor1: " + x);
+            }
+            m1.brakeAll();
+         }
+         if (m2Cmds != null && m2Cmds.size() > 0) {
+
+            while (m2.getNumFinishedCommands() < m2Cmds.size() && !m2.getEbrake()) {
+               try {
+                  Thread.sleep(50);
+               } catch (Throwable t) {
+                  logger.error("UNEXPECTED ERROR DURING SLEEP", t);
+                  break;
+               }
+            }
+            logger.debug("done/w M2");
+            m2.brakeAll();
+         }
       }
       m1.brakeAll();
       m2.brakeAll();
-      return("motors moved");
+      return("motors moved/commanded");
       
    }
 

@@ -57,7 +57,7 @@
         <!-- double handlebar moustaches bind the backend $scope global vars defined in the AJS app file -->
         <!-- you could think of this as egorApp.egorController.g_projectName in a java program -->
         <h1>Hello and welcome to {{g_projectName}} by {{f_lowerCaseIt()}}</h1>
-        <p>(Use Ctrl-Shift-J to view console on Chrome)</p>
+        <p>(Use Ctrl-Shift-J to view console on Chrome, Ctrl-Shift-Del to clear cache)</p>
         <p>(Use F12 to view console on IE)</p>
         <hr/>
         <div class="col-sm-12" name="imageRow">
@@ -104,41 +104,41 @@
                     <div class="panel-body">
                         <div>
                             Oomph (voltage):
-                            <div class="input-group number-spinner">
+                            <div class="input-group">
                             <span class="input-group-btn data-dwn">
-                                <button class="btn btn-default btn-info" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
+                                <button class="btn btn-default btn-info" data-dir="dwn" data-ng-click="f_changeValClick('D_AVG_DOWN')"><span class="glyphicon glyphicon-minus"></span></button>
                             </span>
-                                <input type="text" class="form-control text-center" value="512" min="0" max="2047">
+                                <input type="text" class="form-control text-center" id="txtVolts" ng-model="g_volts"  min="0" max="2047">
                             <span class="input-group-btn data-up">
-                                <button class="btn btn-default btn-info" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
+                                <button class="btn btn-default btn-info" data-dir="up" data-ng-click="f_changeValClick('D_AVG_UP')"><span class="glyphicon glyphicon-plus"></span></button>
                             </span>
                             </div>
                         </div>
                         <div>
                             Smoothness (ramp):
-                            <div class="input-group number-spinner">
+                            <div class="input-group">
                             <span class="input-group-btn data-dwn">
-                                <button class="btn btn-default btn-info" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
+                                <button class="btn btn-default btn-info" data-dir="dwn" data-ng-click="f_changeValClick('D_RAMP_DOWN')"><span class="glyphicon glyphicon-minus"></span></button>
                             </span>
-                                <input type="text" class="form-control text-center" value="512" min="0" max="2047">
+                                <input type="text" class="form-control text-center" id="RAMP" ng-model="g_ramp" min="0" max="2047">
                             <span class="input-group-btn data-up">
-                                <button class="btn btn-default btn-info" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
+                                <button class="btn btn-default btn-info" data-dir="up" data-ng-click="f_changeValClick('D_RAMP_UP')"><span class="glyphicon glyphicon-plus"></span></button>
                             </span>
                             </div>
                         </div>
                         <!--div class="row"-->
                         <div class="funkyradio">
                             <div class="funkyradio-primary">
-                                <input type="radio" name="radio" id="radio1" checked/>
-                                <label for="radio1">Spurt Mode (digital)</label>
+                                <input type="radio" name="radio" id="rdSpurt" data-ng-click="f_moveClick('D_MOTOR_RUN_MODE_SPURT')" checked/>
+                                <label for="rdSpurt">Spurt Mode (digital)</label>
                             </div>
                             <div class="funkyradio-primary">
-                                <input type="radio" name="radio" id="radio2" />
-                                <label for="radio2">Continuous Mode (analog)</label>
+                                <input type="radio" name="radio" id="rdContinuous" data-ng-click="f_moveClick('D_MOTOR_RUN_MODE_CONTINUOUS')"/>
+                                <label for="rdContinuous">Continuous Mode (analog)</label>
                             </div>
                         </div>
                         <!--/div-->
-                        <button type="button" class="btn btn-primary btn-block">Apply</button>
+                        <button type="button" id="APPLY" class="btn btn-primary btn-block" data-ng-click="f_changeValClick('APPLY')">Apply</button>
                     </div>
                 </div>
             </div>

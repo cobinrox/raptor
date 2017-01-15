@@ -15,7 +15,18 @@ public class RCCarMoverImpl implements IMover
     
    //HashMap<String,List< List<String>> uiToMotorCmds;
    public void shutdown(){}
-
+    public void setEbrake(boolean e)
+    {
+        if(m1 != null)m1.setEbrake(true);
+        if(m2 != null)m2.setEbrake(true);
+        if( e )
+        {
+            logger.error("******* EBRAKE REQUESTED **********");
+            m1.setEbrake(e);
+            m2.setEbrake(e);
+            move("E");
+        }
+    }
     public void init(MotorProps mp) throws Throwable
    {
       if( mp.get("MODE").equals("GPIO"))
