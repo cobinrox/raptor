@@ -16,10 +16,15 @@ import com.cobinrox.common.Utils;
  *  If running within IntelliJ, be sure to add the following to the run configuration's VM param settings
  *  for log4j to work:
  *  -Dlog4j.configuration=file:C:\rrr\raptor\io\target\log4j.xml
+ *
+ *  If running out of IDE, be sure to copy io.properties and log4j.xml files to io/target/classes
+ *
+ *  If running on PI, must be run as root (or sudo)
  */
 public class DoMotorCmd {
 	static final Logger logger = Logger.getLogger(DoMotorCmd.class);
-	static final String VERSION = "161230";
+	static final String VERSION = "170117";
+                                          // fix non motor command execution logic, add ebrake call
                                           // provide ability to send non motor commands to saber, e.g. R:512
                                           // more sabertooth logic
                                           // account for sabertooth logic
@@ -150,14 +155,14 @@ public class DoMotorCmd {
 		Scanner scanIn = new Scanner(System.in);
         try {
             while (!input.equalsIgnoreCase("x")) {
-                System.out.println("Enter F/L/R/B/FL/FR/BL/BR/T/H/X --> ");
+                System.out.println("Enter F/L/R/B/FL/FR/BL/BR/T/E/H/X --> ");
                 input = scanIn.nextLine();
                 System.out.println("You entered [" + input + "]");
                 if (input.toUpperCase().equals("X")) {
                     System.out.println("buh-bye!");
                     return;
                 }
-                if( input.length() == 0) input="F";
+                //defaults to forward, but nah if( input.length() == 0) input="F";
                 System.out.println(dmc.doThis(input));
             }
         }
@@ -181,7 +186,15 @@ public class DoMotorCmd {
                }
                return("Re-init complete.");
            }
-	       if(fblr.startsWith("D_"))
+           if(fblr.equals("E")) {
+               mover.setEbrake(true);
+               return "EBrake Set";
+           }
+           else if( fblr.equals("C")) {
+               mover.setEbrake(false);
+               return "EBrake cleared";
+           }
+	       else if(fblr.startsWith("D_"))
 	    	    return(changeData(fblr.toUpperCase()));
            else if( fblr.equals("SAV"))
                return( "Saved data to file [" + Utils.savePropsToUserDir(mp.rawProps,"io") + "]");
@@ -191,12 +204,13 @@ public class DoMotorCmd {
                 return(readData(fblr.toUpperCase()));
            else if(fblr.equals("H"))
                return help();
+
            else
 			    return(moveOneCmdCycle(fblr,null));
 
 	}
 
-    public String readData(String dataStr)
+    protected String readData(String dataStr)
     {
         return MotorProps.getPropsAsDisplayString("\n");
         /*
@@ -280,7 +294,7 @@ public class DoMotorCmd {
      *                underscores are used to separate the three parts
      * @return
      */
-	public String changeData(String dataStr)
+	protected String changeData(String dataStr)
     {
         String ret = "done";
         System.out.println("data change request [" + dataStr + "]");
@@ -395,7 +409,7 @@ public class DoMotorCmd {
             }
             else
             {
-                System.out.println("Changing [" + key + "] from [" + mp.get(key) + "] to [" + newVal.toUpperCase() + "]");
+                logger.info("Changing [" + key + "] from [" + mp.get(key) + "] to [" + newVal.toUpperCase() + "]");
                 mp.set(key,newVal.toUpperCase());
                 //ret = "INVALID DATA CHANGE REQUEST [" + dataStr + "] EXPECTING ONE OF\n";
                 //ret+= help();
@@ -443,7 +457,7 @@ public class DoMotorCmd {
         sb.append("F/L/R/B/FL/FR/BL/BR/H/X (Fwd/Lft/Rt/Bck/Help/eXit)" + (html?"<br/>":"\n"));
 		return sb.toString();
 	}
-	public String moveOneCmdCycle(String uiCmd, String notUsed)
+	protected String moveOneCmdCycle(String uiCmd, String notUsed)
 	{
 		String ret = null;
 		try
@@ -460,6 +474,7 @@ public class DoMotorCmd {
 
 	public void shutdown() throws Throwable
 	{
+        mover.setEbrake(true);
 		mover.shutdown();
 	}
 

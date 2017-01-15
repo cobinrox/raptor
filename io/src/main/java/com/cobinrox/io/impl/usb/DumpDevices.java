@@ -7,6 +7,11 @@ package com.cobinrox.io.impl.usb;
 
 import org.usb4java.*;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.IntBuffer;
+
 /**
  * Dumps the descriptors of all available devices.
  * 
@@ -163,5 +168,48 @@ public class DumpDevices
         
         // Deinitialize the libusb context
         LibUsb.exit(context);
+    }
+
+
+    // Read data from device after claiming it
+    public static String read(DeviceHandle handle, int size, long timeout, int readType) {
+        byte endpointId = (byte) 0x81;
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean started = false;
+        while(true)
+        {
+            ByteBuffer buffer = BufferUtils.allocateByteBuffer(size).order(ByteOrder.LITTLE_ENDIAN);
+            IntBuffer transferred = BufferUtils.allocateIntBuffer();
+            int result;
+            switch(readType)
+            {
+                case 0:
+                    result = LibUsb.interruptTransfer(handle, endpointId, buffer, transferred, timeout);
+                    break;
+                case 1:
+                    result = LibUsb.bulkTransfer(handle, endpointId, buffer, transferred, timeout);
+                    break;
+                default:
+                    result = LibUsb.interruptTransfer(handle, endpointId, buffer, transferred, timeout);
+                    break;
+            }
+            if (result != LibUsb.SUCCESS)
+            {
+                return "Failure reading data with"
+                        + " buffer size:"
+                        + size + " bytes timeout:"
+                        + timeout + " ms error code:"
+                        + result;
+            }else{
+                CharBuffer charBuffer = buffer.asCharBuffer();
+                while(charBuffer.hasRemaining())
+                {
+                    char nextChar = charBuffer.get();
+                    if(nextChar == '\n') started = true; //Start Character
+                    else if(nextChar == '\r' && started) return stringBuilder.toString(); //End Character
+                    else if(started) stringBuilder.append(nextChar);
+                }
+            }
+        }
     }
 }

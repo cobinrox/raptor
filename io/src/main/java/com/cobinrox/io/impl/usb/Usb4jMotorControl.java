@@ -7,6 +7,8 @@ import org.usb4java.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -19,7 +21,7 @@ public class Usb4jMotorControl implements IMotor {
     static final Logger logger = Logger.getLogger(Usb4jMotorControl.class);
     DecimalFormat df = new DecimalFormat("###.#");
     String alias;
-    static public boolean ebrake;
+    static boolean ebrake;
     String g_debugStatusString;
     Thread g_debugStatusThread;
     public int numFinishedCmds;
@@ -35,6 +37,7 @@ public class Usb4jMotorControl implements IMotor {
      * Endpoint for the saber USB port, should prolly put in props file
      */
     byte USB_OUTPUT_ENDPOINT = 2;
+    byte USB_INPUT_ENDPOINT = (byte)0x82;
 
     MotorProps mp;
     public Usb4jMotorControl(String alias) {
@@ -58,6 +61,10 @@ public class Usb4jMotorControl implements IMotor {
         return numFinishedCmds;
     }
 
+    @Override
+    public boolean getEbrake() {return ebrake;}
+
+
 
     /**
      * Creates and starts a new thread on which to send motor commands, then returns.
@@ -73,8 +80,10 @@ public class Usb4jMotorControl implements IMotor {
     public String nonBlockingPulse(final List<String> subCmds, final int cmd_run_time_ms, final int duty_cycle_hi_ms, final int duty_cycle_lo_ms) {
         Thread thrd = new Thread() {
             public void run() {
+                logger.debug("need to process " + subCmds.size() + " subCmds");
                 next_subcmd:
                 for(String subCmd: subCmds) { // = 0; subCmdIdx < subCmds.size(); subCmdIdx++) {
+
                     if(ebrake)
                     {
                         logger.error("---------------------EBRAKE!-------------------------");
@@ -88,8 +97,9 @@ public class Usb4jMotorControl implements IMotor {
                         // command as-is, don't do any pulsing logic
                         try {
                             lowLevelSend(subCmd.substring(1,subCmd.length()-1));
+                            logger.debug("...return from sending command");
                         }catch(Throwable t){logger.error("Sending command",t);}
-                        continue next_subcmd;
+                        //continue next_subcmd;
                     }
                     else {
                         // else, assume subcommand is normal motor movement type command and do use pulsing/timing
@@ -130,19 +140,23 @@ public class Usb4jMotorControl implements IMotor {
                                 elapsedTime = elapsedTime - (stopPulseAt - startPulseAt);
                             }
                         } catch (Throwable th) {
-                            th.printStackTrace();
-                            System.err.println("Error pulsing");
+                            //th.printStackTrace();
+                            //System.err.println("Error pulsing");
+                            logger.error("Error pulsing",th);
                         } finally {
                             long outerStop = System.currentTimeMillis();
                             logger.debug("     ...end pulsing; total time sending cmd: "
                                     + (outerStop - outerStart) + " ms");
                         }
 
-                        logger.debug("     (bumping numFinishedCmds from " + numFinishedCmds + " to " +
-                                (numFinishedCmds+1) + ")");
-                        numFinishedCmds++;
                     }
+                    logger.debug("     (bumping numFinishedCmds from " + numFinishedCmds + " to " +
+                            (numFinishedCmds+1) + ")");
+                    numFinishedCmds++;
+
                 } // end for subcommand
+
+                logger.debug("...end sending subcmds");
             } // end run
         }; // end thread declaration
         thrd.start();
@@ -193,8 +207,10 @@ public class Usb4jMotorControl implements IMotor {
             Transfer transfer = LibUsb.allocTransfer();
 
             IntBuffer transferred = BufferUtils.allocateIntBuffer();
+            logger.debug("...going into bulktransfer");
             int result = LibUsb.bulkTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer,
                     transferred, 5000);
+            logger.debug("...returned from bulktransferk: " + result);
             if (result != LibUsb.SUCCESS)
             {
                 //LibUsb.strError(result);
@@ -206,7 +222,51 @@ public class Usb4jMotorControl implements IMotor {
     private void lowLevelStop(final String plusOrMinusDirChar, final float notUsed) throws Throwable {
         lowLevelPulse(plusOrMinusDirChar, 0);
     }
+    // Read data from device after claiming it
+    public  String read( int size, long timeout) {
 
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean started = false;
+        while(true)
+        {
+            ByteBuffer buffer = BufferUtils.allocateByteBuffer(size).order(ByteOrder.LITTLE_ENDIAN);
+            IntBuffer transferred = BufferUtils.allocateIntBuffer();
+            int result;
+            //switch(readType)
+            {
+                //case 0:
+                //    result = LibUsb.interruptTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, timeout);
+                //    break;
+                //case 1:
+                    result = LibUsb.bulkTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, 5000);
+                //    break;
+                //default:
+                //    result = LibUsb.interruptTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, timeout);
+                //    break;
+            }
+            if (result != LibUsb.SUCCESS)
+            {
+                return "Failure reading data with"
+                        + " buffer size:"
+                        + size + " bytes timeout:"
+                        + timeout + " ms error code:"
+                        + result;
+            }else{
+                CharBuffer charBuffer = buffer.asCharBuffer();
+                while(charBuffer.hasRemaining())
+                {
+                    char nextChar = charBuffer.get();
+                    if(nextChar == '\n') started = true; //Start Character
+                    else if(nextChar == '\r' && started)
+                    {
+                        logger.info("read result: " + stringBuilder.toString());
+                        return stringBuilder.toString(); //End Character
+                    }
+                    else if(started) stringBuilder.append(nextChar);
+                }
+            }
+        }
+    }
     public void hwInit() throws Throwable{
         if(usbHandle != null)
         {

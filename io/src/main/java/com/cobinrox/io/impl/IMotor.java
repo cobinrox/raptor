@@ -12,4 +12,5 @@ public interface IMotor
    public String nonBlockingPulse(List<String> dTs, int cmdRunTime, int dutyHi, int dutyLo);
    public void brakeAll();
    public void setEbrake(boolean brake);
+   public boolean getEbrake();
 }

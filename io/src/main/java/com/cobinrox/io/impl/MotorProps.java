@@ -89,6 +89,7 @@ public class MotorProps {
         logger.info("optionalIoPropsFilePath: [" + optionalIoPropsFilePath + "]");
         optionalPropsPath = optionalIoPropsFilePath;
 		if( rawProps == null ) {
+            logger.info("Reading props file...");
             rawProps = Utils.readProps(optionalIoPropsFilePath, instance, "io");
             if( rawProps == null || rawProps.size() == 0)
             {
