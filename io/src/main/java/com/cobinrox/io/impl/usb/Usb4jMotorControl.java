@@ -6,10 +6,7 @@ import org.apache.log4j.Logger;
 import org.usb4java.*;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -222,12 +219,14 @@ public class Usb4jMotorControl implements IMotor {
     private void lowLevelStop(final String plusOrMinusDirChar, final float notUsed) throws Throwable {
         lowLevelPulse(plusOrMinusDirChar, 0);
     }
+    byte CR=0x0d;
+    byte LF=0x0a;
     // Read data from device after claiming it
     public  String read( int size, long timeout) {
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         boolean started = false;
-        while(true)
+        //while(true)
         {
             ByteBuffer buffer = BufferUtils.allocateByteBuffer(size).order(ByteOrder.LITTLE_ENDIAN);
             IntBuffer transferred = BufferUtils.allocateIntBuffer();
@@ -238,7 +237,8 @@ public class Usb4jMotorControl implements IMotor {
                 //    result = LibUsb.interruptTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, timeout);
                 //    break;
                 //case 1:
-                    result = LibUsb.bulkTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, 5000);
+                logger.info("reading now...");
+                    result = LibUsb.bulkTransfer(usbHandle, USB_INPUT_ENDPOINT, buffer, transferred, 5000);
                 //    break;
                 //default:
                 //    result = LibUsb.interruptTransfer(usbHandle, USB_OUTPUT_ENDPOINT, buffer, transferred, timeout);
@@ -249,22 +249,36 @@ public class Usb4jMotorControl implements IMotor {
                 return "Failure reading data with"
                         + " buffer size:"
                         + size + " bytes timeout:"
-                        + timeout + " ms error code:"
+                        + timeout + " error code:"
                         + result;
             }else{
-                CharBuffer charBuffer = buffer.asCharBuffer();
-                while(charBuffer.hasRemaining())
-                {
-                    char nextChar = charBuffer.get();
-                    if(nextChar == '\n') started = true; //Start Character
-                    else if(nextChar == '\r' && started)
-                    {
-                        logger.info("read result: " + stringBuilder.toString());
-                        return stringBuilder.toString(); //End Character
+                int i = 0;
+                logger.info(buffer.getClass().getName());
+                while(true) {
+                    byte b = 0;
+                    try {
+                        b = buffer.get();
                     }
-                    else if(started) stringBuilder.append(nextChar);
+                    catch(Throwable t)
+                    {
+                        if( t instanceof BufferUnderflowException)
+                        {
+                            // assume finished
+                            logger.info("No more data from buffer");
+                            break;
+                        }
+                        logger.error("ERROR READING FROM " + alias,t);
+                    }
+                    char c = (char) b;
+                    i++;
+                    logger.info("b[" + i + "]:[" + b + "](" + c + ")");
+                    if (b != CR && b != LF) sb.append(c);
+                    else logger.info("CR or LF : " + b);
+                    if (b == LF) break;
+
                 }
             }
+            return sb.toString();
         }
     }
     public void hwInit() throws Throwable{

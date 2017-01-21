@@ -64,7 +64,7 @@
             <!-- I M A G E -->
             <div ng-init="image_reloader(timer=2000,src='img.jpg')">
                 <p>Image updated via url [{{my_image_url}}]</p>
-                <img ng-src="{{image_url}}" height="100" width="100"/>
+                <img ng-src="{{my_image_url}}" height="100" width="100"/>
             </div>
         </div> <!-- image row -->
 
@@ -137,8 +137,9 @@
                                 <label for="rdContinuous">Continuous Mode (analog)</label>
                             </div>
                         </div>
-                        <!--/div-->
+                        <!--/div
                         <button type="button" id="APPLY" class="btn btn-primary btn-block" data-ng-click="f_changeValClick('APPLY')">Apply</button>
+                        <-->
                     </div>
                 </div>
             </div>
@@ -157,6 +158,9 @@
             (D_SIM_1,D_SIM_0)
         </div>
         <hr/>
+        <div><b>location:</b>{{g_location}}</div>
+        <div><b>webctx:</b>{{g_webctx}}</div>
+        <div><b>my_image_url:</b> {{my_image_url}}</div>
         <div><label>Response</label>{{g_moveResponse}}</div>
         <div><label>Status Code</label></div>
         <div><textarea rows="1" cols="50" ng-model="g_httpStatusCode"></textarea></div>

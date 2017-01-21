@@ -95,6 +95,8 @@ public class WheelChairMoverImpl implements IMover
    }
    public String move(String uiCmd)
    {
+      String retMsg = null;
+      boolean isRead = false;
       if( uiCmd.equalsIgnoreCase("E") | uiCmd.equalsIgnoreCase("ebrake")| uiCmd.equalsIgnoreCase("brake"))
       {
          m1.setEbrake(true);
@@ -125,17 +127,21 @@ public class WheelChairMoverImpl implements IMover
             logger.debug("Request nonBlockingPulse(s) to M2...");
             m2.nonBlockingPulse(m2Cmds, mp.m2_cmd_run_time_ms, mp.m2_duty_cycle_hi_ms, mp.m2_duty_cycle_lo_ms);
          }
-boolean isRead = false;
          // major hacke check for read
          if( m1Cmds != null && m1Cmds.size() > 0 )
          {
             if( m1Cmds.get(0).contains("get"))
                isRead = true;
          }
+         if( m2Cmds != null && m2Cmds.size() > 0 )
+         {
+            if( m2Cmds.get(0).contains("get"))
+               isRead = true;
+         }
          // if running in continuous mode, just return
          if (mp.motor_run_mode.equalsIgnoreCase(MotorProps.MOTOR_RUN_MODE_CONTINUOUS) && !isRead) {
-            logger.info("Motors commanded, send Ebrake to stop");
-            return "Motors commanded, send Ebrake to stop";
+            logger.info("Motors commanded, remember to send Ebrake to stop");
+            return "Motors commanded, remember to send Ebrake to stop";
          }
          // else if running in spurt mode, then wait for the commands to finish
          if (m1Cmds != null && m1Cmds.size() > 0) {
@@ -144,17 +150,23 @@ boolean isRead = false;
                try {
                   Thread.sleep(50);
                } catch (Throwable t) {
-                  logger.error("UNEXPECTED ERROR DURING SLEEP", t);
+                  retMsg = "UNEXPECTED ERROR DURRING SLEEP " + t.getMessage();
+                  logger.error(retMsg, t);
                   break;
                }
             }
             logger.debug("done/w M1");
             if(isRead)
             {
-               String x = ((Usb4jMotorControl)m1).read(7,5000);
-               logger.info("read from motor1: " + x);
+               logger.info("Reading...");
+               String x =((Usb4jMotorControl)m1).read(20,5000);
+               logger.info("read from motor1: [" + x +"]");
+               retMsg = retMsg==null?x:(retMsg+" "+x);
+
             }
-            m1.brakeAll();
+            else {
+               m1.brakeAll();
+            }
          }
          if (m2Cmds != null && m2Cmds.size() > 0) {
 
@@ -162,17 +174,31 @@ boolean isRead = false;
                try {
                   Thread.sleep(50);
                } catch (Throwable t) {
-                  logger.error("UNEXPECTED ERROR DURING SLEEP", t);
+                  retMsg = "UNEXPECTED ERROR DURRING SLEEP " + t.getMessage();
+                  logger.error(retMsg, t);
                   break;
                }
             }
             logger.debug("done/w M2");
-            m2.brakeAll();
+            if(isRead)
+            {
+               logger.info("Reading...");
+               String x = ((Usb4jMotorControl)m2).read(20,5000);
+               logger.info("read from motor2: [" + x +"]");
+               retMsg = retMsg==null?x:(retMsg+" "+x);
+
+            }
+            else {
+               m2.brakeAll();
+            }
          }
       }
-      m1.brakeAll();
-      m2.brakeAll();
-      return("motors moved/commanded");
+      if( !isRead ) {
+         m1.brakeAll();
+         m2.brakeAll();
+      }
+      if( retMsg == null ) retMsg = "motors commanded";
+      return retMsg;
       
    }
 

@@ -23,7 +23,8 @@ import com.cobinrox.common.Utils;
  */
 public class DoMotorCmd {
 	static final Logger logger = Logger.getLogger(DoMotorCmd.class);
-	static final String VERSION = "170117";
+	static final String VERSION = "170121";
+                                          // add read capability
                                           // fix non motor command execution logic, add ebrake call
                                           // provide ability to send non motor commands to saber, e.g. R:512
                                           // more sabertooth logic

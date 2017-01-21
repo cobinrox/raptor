@@ -19,4 +19,4 @@ usb4j="/home/share/raptor/mylib/org/usb4java/1.2.1-SNAPSHOT/usb4java-1.2.1-2016-
 
 #echo $pi4j
 
-java -cp .:./io/target:./io/target/classes:./common/target/classes:$libusb4j:$usb4j:$logjar:$jsonjar:$pi4jjar:./io/target/rap_io.jar com.cobinrox.io.DoMotorCmd
+sudo java -cp .:./io/target:./io/target/classes:./common/target/classes:$libusb4j:$usb4j:$logjar:$jsonjar:$pi4jjar:./io/target/rap_io.jar com.cobinrox.io.DoMotorCmd

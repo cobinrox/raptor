@@ -26,7 +26,6 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
         $log.info("In egorController!");
         //console.log("In mainController but using non-angular log!");
         $scope.g_projectName = $filter('uppercase')('Egor Project');
-        
         $scope.g_author = 'EGOR';
 
         $scope.g_moveCmd = '';
@@ -42,6 +41,11 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
         $scope.g_httpResponseData = '';
         $scope.g_httpStatusCode = '';
         $scope.g_error='';
+
+        // debug vars to hold web context info
+        $scope.g_location=location;
+        $scope.g_webctx;
+
         $scope.f_lowerCaseIt = function(){
            return $filter('lowercase')($scope.g_author);
         };
@@ -230,18 +234,13 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
                 $log.info($scope.counter + " " + "timer" + location.host);
                 // add a hash tag to fake out new url to force refresh of a file with the same name,
                 // but which may have changed content back on the server
-                // well hash tag does not work but question mark does seem to work
-                //$scope.image_url = 'http://' + location.host + '/rap-web/img.jpg' + '?' + new Date().getTime();
-                var mywebctx = location.pathname;
-                var webIdx = mywebctx.indexOf('rap-web');
-                mywebctx = location.pathname.substr(0,webIdx+'rap-web'.length);
-                //console.log("mywebct: " + mywebctx);
-                $scope.my_image_url = 'http://' + location.host + mywebctx + '/img.jpg' + '#' + new Date().getTime();
+                $scope.g_location=location;
+                var href = location.href;
+                var indexFileIdx = location.href.indexOf('index.htm');
+                $scope.g_webctx = href.substr(0,indexFileIdx);
+                console.log("mywebctx: " + $scope.g_webctx);
+                $scope.my_image_url = $scope.g_webctx + 'img.jpg'+ '#' + new Date().getTime();
 
-                //var lastSlash = location.pathname.lastIndexOf("/");
-                //var webCtx = location.pathname.substr(0,lastSlash);
-                //$log.info("my webcontext: " + webCtx);
-                //$scope.my_image_url = 'http://' + location.host + webCtx + '/img.jpg' + '#' + new Date().getTime();
                 mytimeout = $timeout($scope.onTimeout,2000);
             }
             var mytimeout = $timeout($scope.onTimeout,2000);
