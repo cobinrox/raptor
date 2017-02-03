@@ -1,0 +1,19 @@
+https://jacobsalmela.com/2014/05/31/raspberry-pi-webcam-using-mjpg-streamer-over-internet/
+sudo apt-get install libjpeg8-dev imagemagick libv4l-dev
+sudo ln -s /usr/include/linux/videodev2.h /usr/include/linux/videodev.h
+wget https://sourceforge.net/code-snapshots/svn/m/mj/mjpg-streamer/code/mjpg-streamer-code-182.zip70
+unzip mjpg-streamer-code-182.zip
+cd mjpg-streamer-code-182/mjpg-streamer
+make mjpg_streamer input_file.so output_http.so
+sudo cp mjpg_streamer /usr/local/bin
+sudo cp output_http.so input_file.so /usr/local/lib/
+sudo cp -R www /usr/local/www
+mkdir /tmp/stream
+#use this to take picture every couple secs:
+#raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/img.jpg -tl 100 -t 9999999 -th 0:0:0 &
+#or use this to take the piacture every couple secs:
+sudo python takepic.py & 
+
+# then use this as server
+LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /var/lib/tomcat8/webapps/rap-web -n img.jpg" -o "output_http.so -p 9090 -w /usr/local/www"
+

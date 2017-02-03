@@ -3,25 +3,36 @@
 import time
 import picamera
 import shutil
+import os
 
 with picamera.PiCamera() as camera:
     camera.resolution = (100, 100)
-    camera.use_video_port=True
+    #####camera.use_video_port=True
     #camera.start_preview()
     # Camera warm-up time
     print "warning up"
     time.sleep(2)
     print "done warming up"
     vaar = 1
+    count=0
     while vaar == 1:
-       print "while"
+       count=count+1
+       if count < 0:
+          count=0
+
+       print "%d" %count 
        #camera.capture_sequence([
        #   '/pi/apache-tomcat-7.0.62/webapps/rap-web/img.jpg'])
        #camera.capture('/home/pi/apache-tomcat-7.0.62/webapps/rap-web/img.jpg')
        camera.capture_sequence([
-          '/home/pi/wtf.jpg'],use_video_port=True)
+          '/var/lib/tomcat8/webapps/rap-web/img.jpg'],use_video_port=True)
+       time.sleep(1)
        #for filename in camera.capture_continuous('wtf.jpg'):
        #print "copying"
-       shutil.copy2('wtf.jpg','/home/pi/apache-tomcat-7.0.62/webapps/rap-web/img.jpg')
+       #shutil.copy2('/home/pi/wtf.jpg','/var/lib/tomcat8/webapps/rap-web/img.jpg')
        print "end seq"
+       fsize = os.path.getsize('/var/lib/tomcat8/webapps/rap-web/img.jpg')
+       if fsize < 1: 
+            print ("file size was 0")
+            time.sleep(2) 
        #time.sleep(1)
