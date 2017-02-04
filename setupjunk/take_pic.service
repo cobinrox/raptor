@@ -1,0 +1,9 @@
+[Unit]
+Description=Take Still Raspicam Pics
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python /home/pi/share/raptor/setupjunk/take_pic.py
+
+[Install]
+WantedBy=multi-user.target 
