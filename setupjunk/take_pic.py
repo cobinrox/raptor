@@ -1,5 +1,7 @@
 # take picture using pi camera video stream and python library
 # much faster snapshots can be taken using this script
+# place the resulting picture files into tomcat8 webapp dir
+#
 import time
 import picamera
 import shutil
@@ -10,7 +12,7 @@ with picamera.PiCamera() as camera:
     #####camera.use_video_port=True
     #camera.start_preview()
     # Camera warm-up time
-    print "warning up"
+    print "warming up"
     time.sleep(2)
     print "done warming up"
     vaar = 1
@@ -27,12 +29,8 @@ with picamera.PiCamera() as camera:
        camera.capture_sequence([
           '/var/lib/tomcat8/webapps/rap-web/img.jpg'],use_video_port=True)
        time.sleep(1)
-       #for filename in camera.capture_continuous('wtf.jpg'):
-       #print "copying"
-       #shutil.copy2('/home/pi/wtf.jpg','/var/lib/tomcat8/webapps/rap-web/img.jpg')
        print "end seq"
        fsize = os.path.getsize('/var/lib/tomcat8/webapps/rap-web/img.jpg')
        if fsize < 1: 
             print ("file size was 0")
             time.sleep(2) 
-       #time.sleep(1)
