@@ -50,10 +50,10 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
         this.mp = mp;
         plusPinNum    = (String) mp.get(alias + "_PLUS_GPIO_PIN");
         minusPinNum   = (String) mp.get(alias + "_MINUS_GPIO_PIN");
-        hwInit();
+        //hwInit();
     }
 
-    abstract protected void hwInit();// {
+    //abstract protected void hwInit();// {
         // set GPIO pin outs
     //}
 

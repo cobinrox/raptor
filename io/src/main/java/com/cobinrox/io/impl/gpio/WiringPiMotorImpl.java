@@ -19,7 +19,7 @@ public class WiringPiMotorImpl extends AbstractGPIOMotorImpl {
 	@Override
 	public void init(MotorProps mp) throws Throwable {
 		super.init(mp);
-		logger.info("Initializing pins to OUTPUT MODE");
+		logger.info("Initializing pins to OUTPUT MODE for wiringpi");
 		try {
 				String cmd = "gpio mode " + super.plusPinNum + " out";
 			    logger.info("preparing cmd [" + cmd + "]...");
@@ -51,8 +51,8 @@ public class WiringPiMotorImpl extends AbstractGPIOMotorImpl {
 		}
 	}
 
-	@Override
-	protected void hwInit()
+	//@Override
+	//protected void hwInit()
 	{
 		logger.info("hwInit for WiringPiMotorImpl not implemented");
 	}

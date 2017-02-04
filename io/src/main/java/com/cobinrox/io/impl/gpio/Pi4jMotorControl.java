@@ -24,7 +24,7 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     @Override
     public void init(MotorProps mp) throws Throwable {
         super.init(mp);
-        logger.info("Initializing pins to OUTPUT MODE");
+        logger.info("Initializing pins to OUTPUT MODE for pi4j");
 
         if (!mp.simulate_pi) {
             try {
@@ -144,11 +144,11 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
         }
     }
 
-    @Override
-    protected void hwInit()
-    {
-        logger.info("hwInit for Pi4jMotorControl class not implemented");
-    }
+    //@Override
+    //protected void hwInit()
+    //{
+    //    logger.info("hwInit for Pi4jMotorControl class not implemented");
+    //}
 
     public void lowLevelPulse(final String d, final float t) throws Throwable {
         logger.debug("          low level move request [" + alias + d + "]");
