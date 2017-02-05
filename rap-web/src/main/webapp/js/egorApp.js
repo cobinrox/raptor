@@ -46,6 +46,9 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
         $scope.g_location=location;
         $scope.g_webctx;
 
+        // make url access to mjpg streamer http
+        $scope.g_mjpg_url = "http://" + location.hostname + ":9090/?action=stream";
+
         $scope.f_lowerCaseIt = function(){
            return $filter('lowercase')($scope.g_author);
         };
@@ -225,7 +228,8 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
         };
         //
         // Timer to refresh image file every xx seconds
-        //
+        // doesn't work
+        /*
         $scope.image_reloader = function(timer,url){
             $log.info("IMAGE RELOADER");
             $scope.counter = 0;
@@ -249,5 +253,6 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
                 $timeout.cancel(mytimeout);
             }
         };
+        */
 
     }]);
