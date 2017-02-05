@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 User=root
-ExecStart=/home/pi/share/raptor/setupjunk/mjpg_stream.sh
+ExecStart=/home/pi/share/raptor/setupjunk/video/mjpg_stream.sh
 
 [Install]
 WantedBy=multi-user.target 

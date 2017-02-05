@@ -6,6 +6,5 @@
 sudo systemctl stop mjpg_stream.service
 sudo systemctl disable mjpg_stream.service 
 sudo rm /etc/systemd/system/mjpg_stream.service
-#rm /etc/systemd/system/take_pic.service symlinks that might be related
 sudo systemctl daemon-reload
 sudo systemctl reset-failed

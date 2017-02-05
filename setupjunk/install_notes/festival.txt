@@ -1,0 +1,2 @@
+Download and install festival package to enable text to speech:
+sudo apt-get install festival

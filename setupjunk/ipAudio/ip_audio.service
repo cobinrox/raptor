@@ -1,0 +1,10 @@
+[Unit]
+Description=Provide MJPG Stream over http port 9090
+After=multi-user.target
+
+[Service]
+User=root
+ExecStart=/home/pi/share/raptor/setupjunk/ipAudio/ip_audio.sh
+
+[Install]
+WantedBy=multi-user.target 
