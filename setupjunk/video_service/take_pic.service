@@ -3,7 +3,7 @@ Description=Take Still Raspicam Pics
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/python /home/pi/share/raptor/setupjunk/video/take_pic.py
+ExecStart=/usr/bin/python /home/pi/share/raptor/setupjunk/video_service/take_pic.py
 
 [Install]
 WantedBy=multi-user.target 

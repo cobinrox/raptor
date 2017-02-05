@@ -1,0 +1,10 @@
+[Unit]
+Description=Provide audio of wlan ip at boot up
+After=multi-user.target
+
+[Service]
+User=root
+ExecStart=/home/pi/share/raptor/setupjunk/ip_audio_service/ip_audio.sh
+
+[Install]
+WantedBy=multi-user.target 

@@ -3,7 +3,7 @@
 # register ip_audio.sh as a systemd service which starts up
 # at boot
 #
-sudo systemctl enable /home/pi/share/raptor/setupjunk/ipAudio/ip_audio.service
+sudo systemctl enable /home/pi/share/raptor/setupjunk/ip_audio_service/ip_audio.service
 sudo systemctl daemon-reload
 sudo systemctl start ip_audio.service
 
