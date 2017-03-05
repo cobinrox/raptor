@@ -191,6 +191,7 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
 
     public void brakeAll() {
         if (!mp.simulate_pi) {
+            //logger.info("DEBUG NPE?" + " " + (pi4jPlusPin==null?"NULL?!!":"no"));
             pi4jPlusPin.low();
             pi4jMinusPin.low();
         } else {
