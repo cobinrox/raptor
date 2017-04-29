@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 
-public class WheelChairMoverImpl implements IMover
+public class DefaultMoverImpl implements IMover
 {
-   static final Logger logger = Logger.getLogger(WheelChairMoverImpl.class);
+   static final Logger logger = Logger.getLogger(DefaultMoverImpl.class);
 
    IMotor m1;
    IMotor m2;

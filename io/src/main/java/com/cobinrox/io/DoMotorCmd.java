@@ -3,8 +3,8 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import com.cobinrox.io.impl.MotorProps;
+import com.cobinrox.io.mover.DefaultMoverImpl;
 import com.cobinrox.io.mover.IMover;
-import com.cobinrox.io.mover.WheelChairMoverImpl;
 import org.apache.log4j.Logger;
 
 import com.cobinrox.common.Utils;
@@ -109,12 +109,11 @@ public class DoMotorCmd {
             //else if( mp.mover_config.equals(MotorProps.MOTOR_CONFIG_PROP_VAL_SINGLE))
             //	mover = new SimpleSingleMotorControl();
         else if( mp.mover_config.equals(MotorProps.MOTOR_CONFIG_PROP_VAL_WHEEL_CHAIR))
-            mover = new WheelChairMoverImpl();
+            mover = new DefaultMoverImpl();
         else
         */
-        // right now we only have this classs implemented, but despite its name, it is
-        // generic, i.e. NOT tied to wheelchair type implementation
-        mover = new WheelChairMoverImpl();
+        // right now we only have this class implemented
+        mover = new DefaultMoverImpl();
 
         try
         {
