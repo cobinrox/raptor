@@ -23,7 +23,7 @@ import com.cobinrox.common.Utils;
  */
 public class DoMotorCmd {
 	static final Logger logger = Logger.getLogger(DoMotorCmd.class);
-	static final String VERSION = "170224";
+	static final String VERSION = "170423";
                                           // add debug statement to Pi4JMotorControl
                                           // add read capability
                                           // fix non motor command execution logic, add ebrake call
@@ -43,6 +43,7 @@ public class DoMotorCmd {
                                           // number of pulses
                                           // add output when using Enable/Direction pin
                                           // more outpt for bad io.props file
+                                          // * allow cmd line io properties file
 
     /**
      * Properties most of which are from io.properties

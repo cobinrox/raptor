@@ -90,7 +90,7 @@ public class MotorProps {
         optionalPropsPath = optionalIoPropsFilePath;
 		if( rawProps == null ) {
             logger.info("Reading props file...");
-            rawProps = Utils.readProps(optionalIoPropsFilePath, instance, "io");
+            rawProps = Utils.readProps(optionalIoPropsFilePath, instance, "x");
             if( rawProps == null || rawProps.size() == 0)
             {
                 System.err.println("Could not parse/find io.props file");

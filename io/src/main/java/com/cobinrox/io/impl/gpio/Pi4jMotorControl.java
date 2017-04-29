@@ -78,7 +78,19 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
 
 
                 }
-                pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias+"+", pinoff);
+                try {
+                    if( pi4jPlusPin != null )
+                    {
+                        logger.info("Pin already provisioned" + alias);
+                        // doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
+                        return;
+                    }
+                    pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias + "+", pinoff);
+                }
+                catch(Throwable t)
+                {
+                    logger.error("Provisioning pin " + pi4jPinNum,t );
+                }
                 if(pi4jPlusPin == null )
                 {
                    logger.error("Could not set Pi4jPlusPin for pin num [" + pi4jPinNum + "] for alias [" + alias + "]");
@@ -129,7 +141,21 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
                     case 20:
                         pi4jPinNum = RaspiPin.GPIO_20;break;
                 }
-                pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias+"-", pinoff);
+                try {
+                    if( pi4jPlusPin != null )
+                    {
+                        //logger.info("Pin previously used, deprovisioning existing pin " + alias);
+                        logger.error("Pin already provisioned");
+                        return;
+                        //doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
+                    }
+                    pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias + "-", pinoff);
+                }
+                catch(Throwable t)
+                {
+                    logger.error("Provisioning pin " + pi4jPinNum,t );
+
+                }
                 if(pi4jMinusPin == null )
                 {
                     logger.error("Could not set pi4jMinusPin for pin num [" + pi4jPinNum + "] for [" + alias + "]");

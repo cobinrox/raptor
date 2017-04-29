@@ -89,6 +89,7 @@ public class Utils {
 		Properties p = null;
 		if( optionalPropsFilePath != null )
 		{
+			prefixFileName = optionalPropsFilePath.substring(0,optionalPropsFilePath.indexOf(".properties"));
 			File test = new File(optionalPropsFilePath);
 			if(!test.exists())
 			{

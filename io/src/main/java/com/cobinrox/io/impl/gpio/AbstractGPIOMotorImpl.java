@@ -128,7 +128,11 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                         continue next_cmd;
                     }
 
-                    float t = Float.parseFloat(thisCmd[1]);
+                    float t = 0;
+                    if( !thisCmd[1].equals("NOP"))
+                    {
+                        t = Float.parseFloat(thisCmd[1]);
+                    }
                     int numMsHi = (int) (duty_cycle_hi_ms * t);//utyCycleHi;//dutyCycleHi;//(int)((float)numMsToRunCmdFor * (float)((float)dutyCycleHi/(float)100));
                     int numMsLo = (int) (duty_cycle_lo_ms);
                     long outerStart = System.currentTimeMillis();
@@ -152,12 +156,12 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                                 return;
                             }
                             logger.info("     turning on for [" + numMsHi + "]ms...");
-                            lowLevelPulse(plusOrMinusDirChar, t);
+                            if( t != 0 )lowLevelPulse(plusOrMinusDirChar, t);
                             Thread.sleep(numMsHi);
 
                             if (numMsLo > 0) {
                                 logger.info("     turning off for [" + numMsLo + "]ms...");
-                                lowLevelStop(plusOrMinusDirChar, t);
+                                if(t != 0 )lowLevelStop(plusOrMinusDirChar, t);
                                 Thread.sleep(numMsLo);
                             }
                             long stopPulseAt = System.currentTimeMillis();
