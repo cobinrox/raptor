@@ -4,4 +4,9 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd"
              version="6">
 
+    <init-param>
+        <param-name>arg0</param-name>
+        <param-value>/home/oracle/share/raptor/sparkwc.properties</param-value>
+    </init-param>
+
 </application>

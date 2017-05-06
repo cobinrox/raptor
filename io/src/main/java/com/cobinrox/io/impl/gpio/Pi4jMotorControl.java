@@ -10,12 +10,15 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
+import java.util.Map;
+import java.util.Set;
+
 public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     static final Logger logger = Logger.getLogger(Pi4jMotorControl.class);
 
     GpioPinDigitalOutput pi4jPlusPin;
     GpioPinDigitalOutput pi4jMinusPin;
-    GpioController pi4jController;
+    static GpioController pi4jController;
 
     public Pi4jMotorControl(String alias) {
         super(alias);
@@ -25,140 +28,149 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     public void init(MotorProps mp) throws Throwable {
         super.init(mp);
         logger.info("Initializing pins to OUTPUT MODE for pi4j");
+        if( pi4jController == null ) {
+            pi4jController = GpioFactory.getInstance();
+        }
 
         if (!mp.simulate_pi) {
             try {
                 pi4jController = GpioFactory.getInstance();
                 PinState pinoff = mp.gpio_on == 1 ? PinState.HIGH : PinState.LOW;
                 int thingToSwitch = alias.equals("M1")?mp.m1_PLUS_GPIO_PIN:mp.m2_PLUS_GPIO_PIN;
-                Pin pi4jPinNum = null;
+                Pin pi4jPinNumPlus = null;
+                Pin pi4jPinNumMinus = null;
                 switch (thingToSwitch) {
                     case 0:
-                        pi4jPinNum = RaspiPin.GPIO_00; break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_00; break;
                     case 1:
-                        pi4jPinNum = RaspiPin.GPIO_01;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_01;break;
                     case 2:
-                        pi4jPinNum = RaspiPin.GPIO_02; break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_02; break;
                     case 3:
-                        pi4jPinNum = RaspiPin.GPIO_03;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_03;break;
                     case 4:
-                        pi4jPinNum = RaspiPin.GPIO_04;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_04;break;
                     case 5:
-                        pi4jPinNum = RaspiPin.GPIO_05;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_05;break;
                     case 6:
-                        pi4jPinNum = RaspiPin.GPIO_06;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_06;break;
                     case 7:
-                        pi4jPinNum = RaspiPin.GPIO_07;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_07;break;
                     case 8:
-                        pi4jPinNum = RaspiPin.GPIO_08;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_08;break;
                     case 9:
-                        pi4jPinNum = RaspiPin.GPIO_09;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_09;break;
                     case 10:
-                        pi4jPinNum = RaspiPin.GPIO_10;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_10;break;
                     case 11:
-                        pi4jPinNum = RaspiPin.GPIO_11;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_11;break;
                     case 12:
-                        pi4jPinNum = RaspiPin.GPIO_12;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_12;break;
                     case 13:
-                        pi4jPinNum = RaspiPin.GPIO_13;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_13;break;
                     case 14:
-                        pi4jPinNum = RaspiPin.GPIO_14;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_14;break;
                     case 15:
-                        pi4jPinNum = RaspiPin.GPIO_15;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_15;break;
                     case 16:
-                        pi4jPinNum = RaspiPin.GPIO_16;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_16;break;
                     case 17:
-                        pi4jPinNum = RaspiPin.GPIO_17;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_17;break;
                     case 18:
-                        pi4jPinNum = RaspiPin.GPIO_18;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_18;break;
                     case 19:
-                        pi4jPinNum = RaspiPin.GPIO_19;break;
+                        pi4jPinNumPlus = RaspiPin.GPIO_19;break;
                     case 20:
-                        pi4jPinNum = RaspiPin.GPIO_20;break;
-
-
-                }
-                try {
-                    if( pi4jPlusPin != null )
-                    {
-                        logger.info("Pin already provisioned" + alias);
-                        // doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
-                        return;
-                    }
-                    pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias + "+", pinoff);
-                }
-                catch(Throwable t)
-                {
-                    logger.error("Provisioning pin " + pi4jPinNum,t );
-                }
-                if(pi4jPlusPin == null )
-                {
-                   logger.error("Could not set Pi4jPlusPin for pin num [" + pi4jPinNum + "] for alias [" + alias + "]");
+                        pi4jPinNumPlus = RaspiPin.GPIO_20;break;
                 }
 
                 thingToSwitch = alias.equals("M1")?mp.m1_MINUS_GPIO_PIN:mp.m2_MINUS_GPIO_PIN;
                 switch (thingToSwitch) {
                     case 0:
-                        pi4jPinNum = RaspiPin.GPIO_00; break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_00; break;
                     case 1:
-                        pi4jPinNum = RaspiPin.GPIO_01;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_01;break;
                     case 2:
-                        pi4jPinNum = RaspiPin.GPIO_02; break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_02; break;
                     case 3:
-                        pi4jPinNum = RaspiPin.GPIO_03;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_03;break;
                     case 4:
-                        pi4jPinNum = RaspiPin.GPIO_04;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_04;break;
                     case 5:
-                        pi4jPinNum = RaspiPin.GPIO_05;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_05;break;
                     case 6:
-                        pi4jPinNum = RaspiPin.GPIO_06;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_06;break;
                     case 7:
-                        pi4jPinNum = RaspiPin.GPIO_07;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_07;break;
                     case 8:
-                        pi4jPinNum = RaspiPin.GPIO_08;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_08;break;
                     case 9:
-                        pi4jPinNum = RaspiPin.GPIO_09;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_09;break;
                     case 10:
-                        pi4jPinNum = RaspiPin.GPIO_10;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_10;break;
                     case 11:
-                        pi4jPinNum = RaspiPin.GPIO_11;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_11;break;
                     case 12:
-                        pi4jPinNum = RaspiPin.GPIO_12;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_12;break;
                     case 13:
-                        pi4jPinNum = RaspiPin.GPIO_13;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_13;break;
                     case 14:
-                        pi4jPinNum = RaspiPin.GPIO_14;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_14;break;
                     case 15:
-                        pi4jPinNum = RaspiPin.GPIO_15;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_15;break;
                     case 16:
-                        pi4jPinNum = RaspiPin.GPIO_16;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_16;break;
                     case 17:
-                        pi4jPinNum = RaspiPin.GPIO_17;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_17;break;
                     case 18:
-                        pi4jPinNum = RaspiPin.GPIO_18;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_18;break;
                     case 19:
-                        pi4jPinNum = RaspiPin.GPIO_19;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_19;break;
                     case 20:
-                        pi4jPinNum = RaspiPin.GPIO_20;break;
+                        pi4jPinNumMinus = RaspiPin.GPIO_20;break;
                 }
                 try {
                     if( pi4jPlusPin != null )
                     {
-                        //logger.info("Pin previously used, deprovisioning existing pin " + alias);
-                        logger.error("Pin already provisioned");
+                        logger.info("Plus Pin already provisioned" + alias);
+                        // doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
                         return;
-                        //doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
                     }
-                    pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNum, alias + "-", pinoff);
+                    pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumPlus, alias + "+", pinoff);
+                    //pi4jController.
                 }
                 catch(Throwable t)
                 {
-                    logger.error("Provisioning pin " + pi4jPinNum,t );
+                    logger.error("Provisioning pin " + pi4jPinNumPlus,t );
+                }
+                if(pi4jPlusPin == null )
+                {
+                    logger.error("Could not set Pi4jPlusPin for pin num [" + pi4jPinNumPlus + "] for alias [" + alias + "]");
+                }
 
+                try {
+                    if( pi4jMinusPin != null )
+                    {
+                        logger.error("Minus Pin already provisioned");
+                        return;
+                        //doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
+                    }
+                    pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumMinus, alias + "-", pinoff);
+                }
+                catch(Throwable t)
+                {
+                    logger.error("Provisioning pin " + pi4jPinNumMinus,t );
                 }
                 if(pi4jMinusPin == null )
                 {
-                    logger.error("Could not set pi4jMinusPin for pin num [" + pi4jPinNum + "] for [" + alias + "]");
+                    logger.error("Could not set pi4jMinusPin for pin num [" + pi4jPinNumMinus + "] for [" + alias + "]");
+                }
+
+                if( pi4jPinNumPlus != null && pi4jPinNumMinus != null)
+                {
+                    pi4jMinusPin.setState(PinState.LOW);
+                    pi4jPlusPin.setState(PinState.LOW);
+
                 }
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -176,6 +188,12 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     //    logger.info("hwInit for Pi4jMotorControl class not implemented");
     //}
 
+    /**
+     *
+     * @param d direction character + or -
+     * @param t time value 1, 2, etc. num times to pulse, normally set to 1
+     * @throws Throwable
+     */
     public void lowLevelPulse(final String d, final float t) throws Throwable {
         logger.debug("          low level move request [" + alias + d + "]");
 

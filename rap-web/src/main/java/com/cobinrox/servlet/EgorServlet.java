@@ -55,6 +55,7 @@ public class EgorServlet extends javax.servlet.http.HttpServlet {
                 System.err.println("LogFile: " + ((FileAppender)app).getFile());
             }
         }
+        System.out.println("arg0: " + servletConfig.getInitParameter("arg0"));
     }
     protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
         if(! stupid )

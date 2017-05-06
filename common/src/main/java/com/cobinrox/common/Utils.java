@@ -95,6 +95,7 @@ public class Utils {
 			{
 				System.err.println("NOTE your props file [" + optionalPropsFilePath + "] (" + test.getAbsolutePath() + ") does not appear to exist");
 			}
+			logger.info("Expected props file:[" + test.getAbsolutePath() + "]");
 			p = new Properties();
 			Reader r = null;
 			try
