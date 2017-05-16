@@ -23,7 +23,8 @@ import com.cobinrox.common.Utils;
  */
 public class DoMotorCmd {
 	static final Logger logger = Logger.getLogger(DoMotorCmd.class);
-	static final String VERSION = "170505";
+	static final String VERSION = "170514";
+                                          // add more info to pi4j pin info
                                           // add debug statement to Pi4JMotorControl
                                           // add read capability
                                           // fix non motor command execution logic, add ebrake call

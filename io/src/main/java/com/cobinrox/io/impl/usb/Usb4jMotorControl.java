@@ -77,6 +77,8 @@ public class Usb4jMotorControl implements IMotor {
     public String nonBlockingPulse(final List<String> subCmds, final int cmd_run_time_ms, final int duty_cycle_hi_ms, final int duty_cycle_lo_ms) {
         Thread thrd = new Thread() {
             public void run() {
+                System.out.println(mp.get(mp.USB_VOLT_STRENGTH_PROP));
+
                 logger.debug("need to process " + subCmds.size() + " subCmds");
                 next_subcmd:
                 for(String subCmd: subCmds) { // = 0; subCmdIdx < subCmds.size(); subCmdIdx++) {

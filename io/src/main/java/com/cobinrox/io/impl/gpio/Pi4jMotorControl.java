@@ -1,17 +1,11 @@
 package com.cobinrox.io.impl.gpio;
 
+import com.cobinrox.common.Utils;
 import com.cobinrox.io.impl.MotorProps;
+import com.pi4j.io.gpio.*;
 import org.apache.log4j.Logger;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     static final Logger logger = Logger.getLogger(Pi4jMotorControl.class);
@@ -28,13 +22,16 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
     public void init(MotorProps mp) throws Throwable {
         super.init(mp);
         logger.info("Initializing pins to OUTPUT MODE for pi4j");
-        if( pi4jController == null ) {
-            pi4jController = GpioFactory.getInstance();
-        }
+
 
         if (!mp.simulate_pi) {
             try {
-                pi4jController = GpioFactory.getInstance();
+                if( pi4jController == null )
+                {
+                    pi4jController = GpioFactory.getInstance();
+                }
+
+
                 PinState pinoff = mp.gpio_on == 1 ? PinState.HIGH : PinState.LOW;
                 int thingToSwitch = alias.equals("M1")?mp.m1_PLUS_GPIO_PIN:mp.m2_PLUS_GPIO_PIN;
                 Pin pi4jPinNumPlus = null;
@@ -130,14 +127,33 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
                         pi4jPinNumMinus = RaspiPin.GPIO_20;break;
                 }
                 try {
-                    if( pi4jPlusPin != null )
-                    {
-                        logger.info("Plus Pin already provisioned" + alias);
-                        // doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
-                        return;
+                    try {
+                        pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumPlus, alias + "+", pinoff);
                     }
-                    pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumPlus, alias + "+", pinoff);
-                    //pi4jController.
+                    catch( Throwable t)
+                    {
+                        logger.error("Error Provisioning pin " + Utils.getStackTraceAsString(t));
+                        List <GpioPin>provisionedPins = new ArrayList(pi4jController.getProvisionedPins());
+                            GpioPin gp = null;
+                            for( GpioPin pp:provisionedPins) {
+                                if (pp.getName().equals(alias + "+")) {
+                                    logger.info("need to deprovision...");
+                                    gp = pp;
+                                    break;
+                                }
+                            }
+                            if( gp != null )
+                            {
+                                logger.info("deprovisioning...");
+                                pi4jController.unprovisionPin(gp);
+                                /*try {
+                                    Thread.currentThread().sleep(1000);
+                                } catch (Throwable t2) {
+                                }*/
+                            }
+                            pi4jPlusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumPlus, alias + "+", pinoff);
+                            logger.info("W00T !!!");
+                    }
                 }
                 catch(Throwable t)
                 {
@@ -147,31 +163,61 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
                 {
                     logger.error("Could not set Pi4jPlusPin for pin num [" + pi4jPinNumPlus + "] for alias [" + alias + "]");
                 }
-
+                else {
+                    // TURN OFF ! ! ! !
+                    pi4jPlusPin.setState(PinState.LOW);
+                }
                 try {
-                    if( pi4jMinusPin != null )
-                    {
-                        logger.error("Minus Pin already provisioned");
-                        return;
-                        //doesn't work pi4jController.unprovisionPin(pi4jPlusPin);
+                    try {
+                        pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumMinus, alias + "-", pinoff);
                     }
-                    pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumMinus, alias + "-", pinoff);
+                    catch( Throwable t)
+                    {
+                        logger.error("Error Provisioning pin " + Utils.getStackTraceAsString(t));
+                        List <GpioPin>provisionedPins = new ArrayList(pi4jController.getProvisionedPins());
+                        GpioPin gp = null;
+                        for( GpioPin pp:provisionedPins) {
+                            if (pp.getName().equals(alias + "-")) {
+                                logger.info("need to deprovision...");
+                                gp = pp;
+                                break;
+                            }
+                        }
+                        if( gp != null )
+                        {
+                            logger.info("deprovisioning...");
+                            pi4jController.unprovisionPin(gp);
+                            /*
+                            try {
+                                Thread.currentThread().sleep(1000);
+                            } catch (Throwable t2) {
+                            }
+                            */
+                        }
+                        pi4jMinusPin = pi4jController.provisionDigitalOutputPin(pi4jPinNumMinus, alias + "-", pinoff);
+                        logger.info("W00T2 !!!");
+                    }
                 }
                 catch(Throwable t)
                 {
-                    logger.error("Provisioning pin " + pi4jPinNumMinus,t );
+                    logger.error("Provisioning pin " + pi4jPinNumPlus,t );
                 }
-                if(pi4jMinusPin == null )
+                if(pi4jPinNumMinus == null )
                 {
-                    logger.error("Could not set pi4jMinusPin for pin num [" + pi4jPinNumMinus + "] for [" + alias + "]");
+                    logger.error("Could not set Pi4jMinusPin for pin num [" + pi4jPinNumMinus + "] for alias [" + alias + "]");
                 }
-
+                else {
+                    // TURN OFF ! ! ! !
+                    pi4jMinusPin.setState(PinState.LOW);
+                }
+                /*
                 if( pi4jPinNumPlus != null && pi4jPinNumMinus != null)
                 {
                     pi4jMinusPin.setState(PinState.LOW);
                     pi4jPlusPin.setState(PinState.LOW);
 
                 }
+                */
             } catch (Throwable t) {
                 t.printStackTrace();
                 System.err.println("ERROR setting pin modes!  Cannot run!");

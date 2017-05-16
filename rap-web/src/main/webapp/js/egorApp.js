@@ -128,16 +128,9 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
             }
             else if (l_val_direction.valueOf() == 'D_AVG_DOWN')
             {
-                if($scope.g_volts == $scope_g_vr_min) return;
-                if(! $scope.g_volts > $scope.g_vr_min &&
-                    $scope.g_volts-$scope.g_vr_step >= $scope.g_vr_min) {
-                    $scope.g_volts -= $scope.g_vr_step;
+                if($scope.g_volts == $scope.g_vr_min) return;
+                $scope.g_volts -= $scope.g_vr_step;
 
-                }
-                else
-                {
-                    $scope.g_volts = $scope.g_vr_min;
-                }
                 f_sendMoveCmd('D_AVG_' + $scope.g_volts);
             }
             if (l_val_direction.valueOf() == 'D_RAMP_UP')
@@ -146,7 +139,6 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
                 if(! $scope.g_ramp < $scope.g_vr_max &&
                     $scope.g_ramp+$scope.g_vr_step <= $scope.g_vr_max) {
                     $scope.g_ramp += $scope.g_vr_step;
-
                 }
                 else
                 {
@@ -157,14 +149,8 @@ egorApp.controller('egorController', ['$scope','$log','$filter','$resource','$ht
             else if (l_val_direction.valueOf() == 'D_RAMP_DOWN')
             {
                 if( $scope.g_ramp == $scope.g_vr_min) return;
-                if(! $scope.g_ramp > $scope.g_vr_min &&
-                    $scope.g_ramp-$scope.g_vr_step >= $scope.g_vr_min) {
                     $scope.g_ramp -= $scope.g_vr_step;
-                }
-                else
-                {
-                    $scope.g_ramp = $scope.g_vr_min;
-                }
+
                 f_sendMoveCmd('D_RAMP_' + $scope.g_ramp);
             }
         }
