@@ -1,0 +1,10 @@
+[Unit]
+Description=Checks GPIO switch states
+After=multi-user.target
+
+[Service]
+User=root
+ExecStart=/usr/bin/python /home/pi/share/raptor/setupjunk/chk_gpio_state_service/chk_gpio_state.py
+
+[Install]
+WantedBy=multi-user.target 

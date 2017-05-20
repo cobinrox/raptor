@@ -1,6 +1,6 @@
 #
 # Read two GPIO buttons which  can be used to set up
-# desired wlan configuration
+# to represent various states
 #
 # 00 dhcp
 # 01 static IP
