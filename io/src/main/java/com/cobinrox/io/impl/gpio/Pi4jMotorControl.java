@@ -241,7 +241,7 @@ public class Pi4jMotorControl extends AbstractGPIOMotorImpl {
      * @throws Throwable
      */
     public void lowLevelPulse(final String d, final float t) throws Throwable {
-        logger.debug("          low level move request [" + alias + d + "]");
+        logger.debug("          low level execute request [" + alias + d + "]");
 
         String m1Info = null;
         if (d != null) {

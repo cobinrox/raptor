@@ -31,4 +31,29 @@ public class AppTest
 		HashMap<String,List<String>> hm = MotorProps.parseHighLevelMotorCmdsToLowLevelDTs(str,false);
 		System.out.println("check ");
 	}
+
+	public void testIncCyclePercent() throws Throwable{
+		String mAlias = "m1";
+
+		// 50 percent
+		int percentage = 50;
+		int cycleTime = 500;
+		MotorProps mp = new MotorProps();
+		MotorProps.lowlevelSetDutyHiPercent(mAlias,percentage,cycleTime);
+System.out.println("duty hi: " + mp.m1_duty_cycle_hi_ms);
+System.out.println("duty lo: " + mp.m1_duty_cycle_lo_ms);
+		assertEquals(mp.m1_duty_cycle_hi_ms,250);
+		assertEquals(mp.m1_duty_cycle_lo_ms,250);
+
+
+		// 100 percent
+		 percentage = 100;
+		 cycleTime = 500;
+		MotorProps.lowlevelSetDutyHiPercent(mAlias,percentage,cycleTime);
+		System.out.println("duty hi: " + mp.m1_duty_cycle_hi_ms);
+		System.out.println("duty lo: " + mp.m1_duty_cycle_lo_ms);
+		assertEquals(mp.m1_duty_cycle_hi_ms,500);
+		assertEquals(mp.m1_duty_cycle_lo_ms,0);
+
+	}
 }

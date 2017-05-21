@@ -23,7 +23,9 @@ import com.cobinrox.common.Utils;
  */
 public class DoMotorCmd {
 	static final Logger logger = Logger.getLogger(DoMotorCmd.class);
-	static final String VERSION = "170514";
+	static final String VERSION = "170521";
+                                          // refactor var names
+                                          // add command to increase duty cycle hi by percentage of cmd run time
                                           // add more info to pi4j pin info
                                           // add debug statement to Pi4JMotorControl
                                           // add read capability
@@ -53,17 +55,17 @@ public class DoMotorCmd {
 	MotorProps mp = new MotorProps();
 
     /**
-     * Low level motor mover interface
+     * Mid level motor mover interface
      */
 	IMover mover;
 
     /**
-     * Optional file name that can be passed in on command line
+     * Optional file name that can be passed in on command line for properties file
      */
     String optionalIoPropsFilePath;
 
     /**
-     * Indicates if started up by main (by human) or not (maybe
+     * Indicates if started up by main (by human) or not (can be
      * started up as helper class by servlet)
      */
     static boolean main = false;
@@ -75,9 +77,15 @@ public class DoMotorCmd {
     {
         // mp is created via static init
 
-        // this init will set mp variables, types etc
-        init(null);
     }
+
+    /**
+     * Constructor
+     * @param optionalIoPropsFilePath path to properties file, if null then
+     *                                back-end MP tries to find properties
+     *                                in classpath
+     * @throws IOException
+     */
     public DoMotorCmd(String optionalIoPropsFilePath) throws IOException
     {
         this.optionalIoPropsFilePath = optionalIoPropsFilePath;
@@ -85,7 +93,8 @@ public class DoMotorCmd {
     }
 
     /**
-     * Allows caller to re-read the props file
+     * Allows caller to re-read the props file, if, for example, the caller
+     * had edited the props file and need new params to take effect
      */
     private void reReadProps() throws IOException
     {
@@ -93,6 +102,13 @@ public class DoMotorCmd {
         mp.clearProps();
         init(optionalIoPropsFilePath);
     }
+
+    /**
+     * Read props file values
+     * @param optionalIoPropsPath path to props file, if null then MP does classpath
+     *                            search for logical props file location
+     * @throws IOException
+     */
     private void init(String optionalIoPropsPath) throws IOException
     {
         mp.setMotorVariables(optionalIoPropsPath,true);
@@ -119,6 +135,7 @@ public class DoMotorCmd {
 
         try
         {
+            // initialize lower-level motor controller hware based on settings in properties file
             mover.init(mp);
         }
         catch(Throwable t)
@@ -156,136 +173,76 @@ public class DoMotorCmd {
         System.out.println(" Greetings, you can enter the following commands:");
         System.out.println(dmc.help(false));
 		String input = "";
-		Scanner scanIn = new Scanner(System.in);
+		Scanner keyboardInput = new Scanner(System.in);
         try {
             while (!input.equalsIgnoreCase("x")) {
-                System.out.println("Enter F/L/R/B/FL/FR/BL/BR/T/E/H/X --> ");
-                input = scanIn.nextLine();
+                System.out.println("Enter F/L/R/B/FL/FR/BL/BR/T/E/H/RRP/X --> ");
+                input = keyboardInput.nextLine();
                 System.out.println("You entered [" + input + "]");
                 if (input.toUpperCase().equals("X")) {
                     System.out.println("buh-bye!");
                     return;
                 }
-                //defaults to forward, but nah if( input.length() == 0) input="F";
                 System.out.println(dmc.doThis(input));
             }
         }
         finally
         {
-            scanIn.close();
+            keyboardInput.close();
         }
 	}
-	public String doThis(String fblr )
+	public String doThis(String command)
 	{
-		   fblr = fblr.toUpperCase();
+		   command = command.toUpperCase();
 
-           if( fblr.equals("REREAD_PROPS"))
+           if( command.equals("REREAD_PROPS") || command.equals("RRP"))
            {
                try {
                    reReadProps();
                }
                catch(IOException e)
                {
+                   String es = Utils.getStackTraceAsString(e);
                    logger.error("Reading io.properties file ",e);
+                   return ("REREAD_PROPS ERROR: " + es);
                }
-               return("Re-init complete.");
+               return("REREAD_PROPS/Re-init complete.");
            }
-           if(fblr.equals("E")) {
+           if(command.equals("E")) {
                mover.setEbrake(true);
                return "EBrake Set";
            }
-           else if( fblr.equals("C")) {
+           else if( command.equals("C")) {
                mover.setEbrake(false);
                return "EBrake cleared";
            }
-	       else if(fblr.startsWith("D_"))
-	    	    return(changeData(fblr.toUpperCase()));
-           else if( fblr.equals("SAV"))
+	       else if(command.startsWith("D_"))
+	    	    return(changeKeyValue(command));
+           else if(command.startsWith("P_"))
+                return(changePercentValue(command));
+           else if( command.equals("SAV"))
                return( "Saved data to file [" + Utils.savePropsToUserDir(mp.rawProps,"io") + "]");
-           else if( fblr.equals("DEL"))
+           else if( command.equals("DEL"))
                return(  Utils.delOldPropsFileFromUserDir("io"));
-           else if(fblr.startsWith("RD"))
-                return(readData(fblr.toUpperCase()));
-           else if(fblr.equals("H"))
+           else if(command.startsWith("RD"))
+                return(readData(command.toUpperCase()));
+           else if(command.equals("H"))
                return help();
 
            else
-			    return(moveOneCmdCycle(fblr,null));
+			    return(executeCommand(command,null));
 
 	}
 
+    /**
+     * Read data from properties
+     * @param dataStr
+     * @return
+     */
     protected String readData(String dataStr)
     {
         return MotorProps.getPropsAsDisplayString("\n");
-        /*
-        String ret = "";
-        System.out.println("read request [" + dataStr + "]");
 
-        String[] parsed = dataStr.split("_");
-        if( parsed.length < 2 )
-        {
-            ret = "Invalid data read request [" + dataStr + "] Expecting R of\n";
-            ret+= help();
-            return ret;
-        }
-        String key = parsed[1];
-
-        try
-        {
-            if( key.equals("M1RT"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M1_CMD_RUN_TIME_MS_PROP) +"]";
-            }
-            else if( key.equals("M2RT"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M2_CMD_RUN_TIME_MS_PROP) +"]";
-            }
-            else if(key.equals("M1HI"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M1_DUTY_CYCLE_HI_MS_PROP) +"]";
-            }
-            else if(key.equals("M1LO"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M1_DUTY_CYCLE_LO_MS_PROP) +"]";
-            }
-            else if(key.equals("M2HI"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M2_DUTY_CYCLE_HI_MS_PROP) +"]";
-            }
-            else if(key.equals("M2LO"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M2_DUTY_CYCLE_LO_MS_PROP) +"]";
-            }
-            else if(key.equals("M1+"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M1_PLUS_GPIO_PIN) +"]";
-            }
-            else if(key.equals("M1-"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M1_MINUS_GPIO_PIN) +"]";
-            }
-            else if(key.equals("M2+"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M2_PLUS_GPIO_PIN) +"]";
-            }
-            else if(key.equals("M2-"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.M2_MINUS_GPIO_PIN) +"]";
-            }
-            else if(key.equals("SIM"))
-            {
-                ret = dataStr + " = [" + mp.get(mp.SIMULATE_PI_PROP) +"]";
-            }
-        }
-        catch(Throwable t)
-        {
-            ret = "Invalid data read request [" + dataStr + "] Expecting one of\n";
-            ret+= help();
-
-            return ret;
-        }
-        return ret;
-        */
     }
     /**
      * Change back-end motor properties.
@@ -298,7 +255,7 @@ public class DoMotorCmd {
      *                underscores are used to separate the three parts
      * @return
      */
-	protected String changeData(String dataStr)
+	protected String changeKeyValue(String dataStr)
     {
         String ret = "done";
         System.out.println("data change request [" + dataStr + "]");
@@ -314,9 +271,6 @@ public class DoMotorCmd {
         String key = dataStr.substring(2,dataStr.lastIndexOf("_"));
         String newVal = parsed[parsed.length-1];
 
-        //sb.append("D_RT_<float> (set cmd run time ms)");
-        //sb.append("D_HI_<float> (set duty hi time ms)");
-        //sb.append("D_LO_<float> (set duty lo time ms)");
         try
         {
             if( key.equals("M1RT"))
@@ -415,9 +369,6 @@ public class DoMotorCmd {
             {
                 logger.info("Changing [" + key + "] from [" + mp.get(key) + "] to [" + newVal.toUpperCase() + "]");
                 mp.set(key,newVal.toUpperCase());
-                //ret = "INVALID DATA CHANGE REQUEST [" + dataStr + "] EXPECTING ONE OF\n";
-                //ret+= help();
-                //return ret;
             }
         }
         catch(Throwable t)
@@ -430,11 +381,68 @@ public class DoMotorCmd {
         mover.dataChanged(key, newVal);
         return ret;
     }
+
+    /**
+     * Change the value of the duty hi/lo values for a motor as a percentage of the total command run time.
+     * Example: run time cycle: 1 sec
+     * To change m1's motor to be 50% hi, use P_M1_50
+     * @param dataStr Percentage command in the format P_<ALIAS>_<PERCENTAGE>, e.g. P_M1_50
+     * @return
+     */
+    protected String changePercentValue(String dataStr)
+    {
+        String ret = "done";
+        System.out.println("percent change request [" + dataStr + "]");
+
+        String[] parsedVals = dataStr.split("_");
+        if( parsedVals.length < 3 )
+        {
+            ret = "Invalid data percent request [" + dataStr + "] Expecting\n";
+            ret+= "P_M1_<percentVal>\n"+
+                  "P_M2_<percentVal>";
+            return ret;
+        }
+        String key     = parsedVals[1];
+        String percent = parsedVals[2];
+        int percentI = 0;
+        try
+        {
+            percentI = Integer.parseInt(percent);
+        }
+        catch(Throwable t)
+        {
+            ret = "Invalid percent value [" + percent + "]";
+            return ret;
+        }
+        try
+        {
+             MotorProps.setDutyHiAsPercentOfTotalRunTime(key,percentI);
+        }
+        catch(Throwable t)
+        {
+            t.printStackTrace();
+            ret = "EXCEPTION (" + t.getMessage() + ") DURING DATA CHANGE REQUEST [" + dataStr + "] Expecting one of\n";
+            ret+= help();
+            return ret;
+        }
+        //mover.dataChanged(key, newVal);
+        return ret;
+    }
+
+    /**
+     * Display commands
+     * @return String containing commands
+     */
     public static String help()
     {
        return help(main?false:true);
     }
 
+    /**
+     * Display commands with optional html BR rather than \n as line delimiter
+     * @param html boolean, true=yes include <br/> at end of lines, false=no, just use \n
+     * @return list of commands
+     */
 	public static String help(boolean html)
 	{
 		StringBuffer sb = new StringBuffer("");
@@ -454,24 +462,25 @@ public class DoMotorCmd {
         sb.append("D_MOTOR_RUN_MODE_<spurt or continuous>" + (html?"<br/>":"\n"));
         sb.append("D_AVG_<integer> (set USB voltage val)" + (html?"<br/>":"\n"));
 		sb.append("D_SIM_<integer> (set simulate mode)" + (html?"<br/>":"\n"));
+        sb.append("P_MX_<integer> (set MX duty hi as % of run time)" + (html?"<br/>":"\n"));
 		sb.append("SAV (save props file)" + (html?"<br/>":"\n"));
         sb.append("DEL (del old props file)" + (html?"<br/>":"\n"));
         sb.append("RD (read/dump current prop vals)" + (html?"<br/>":"\n"));
-        sb.append("REREAD_PROPS (re-initialize from props files)" + (html?"<br/>":"\n"));
+        sb.append("RRP/REREAD_PROPS (re-initialize from props files)" + (html?"<br/>":"\n"));
         sb.append("F/L/R/B/FL/FR/BL/BR/H/X (Fwd/Lft/Rt/Bck/Help/eXit)" + (html?"<br/>":"\n"));
 		return sb.toString();
 	}
-	protected String moveOneCmdCycle(String uiCmd, String notUsed)
+	protected String executeCommand(String uiCmd, String notUsed)
 	{
 		String ret = null;
 		try
 		{
-			ret = mover.move(uiCmd);
+			ret = mover.execute(uiCmd);
 		}
 		catch(Throwable t)
 		{
-			ret = "ERROR DURING MOVE " + Utils.getStackTraceAsString(t);
-			logger.error("ERROR DURING MOVE",t);
+			ret = "ERROR DURING EXECUTION " + Utils.getStackTraceAsString(t);
+			logger.error("ERROR DURING EXECUTION",t);
 		}
 		return ret;
 	}

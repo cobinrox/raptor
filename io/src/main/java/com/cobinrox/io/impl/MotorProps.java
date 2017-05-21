@@ -24,10 +24,10 @@ public class MotorProps {
     public static short  usb_ID_PRODUCT;   public static final String USB_ID_PRODUCT    = "USB_ID_PRODUCT";
 
     /**
-     * For saber board, this value represents the value that we normally send to the motor to move, it can
+     * For saber board, this value represents the value that we normally send to the motor to execute, it can
      * be a value from 0 to 2047, where the lower the absolute value, the less voltage and strength
      * is applied to the motors, so to give the motor more oopmph, you could set this value to a higher
-     * number.  This number is used to move either forward or backward, although going backward on wheelchair
+     * number.  This number is used to execute either forward or backward, although going backward on wheelchair
      * sometimes needs more oomph, so we might want to provide both a forward and backward volt strength
      * value.
      * This value, by the way, is similar to the pulse mode params that are used for the GPIO motor control, it's
@@ -371,4 +371,44 @@ public class MotorProps {
             logger.error("******* COULD NOT SET " + key + "/" + val,e);
         }
 	}
+
+    /**
+     * Set the hi (and low) duty cycle length of time based on a percentage of the total run time
+     * for given motor.
+     * Example:  run time = 500 ms
+     *           percentage = 50 percent
+     *           resulting duty cycle hi = 250, duty cycle lo = 250
+     * @param mAlias
+     * @param percentage
+     */
+    public static void setDutyHiAsPercentOfTotalRunTime (String mAlias, int percentage)
+    {
+        lowlevelSetDutyHiPercent(mAlias,percentage,
+                mAlias.equalsIgnoreCase("m1")?m1_cmd_run_time_ms:m2_cmd_run_time_ms
+
+                );
+    }
+    public static void lowlevelSetDutyHiPercent(String mAlias, int percentage, int cmdRunTime)
+    {
+        if( percentage < 0 || percentage > 100 )
+        {
+            logger.error("Invalid increment value [" + percentage + "]");
+            return;
+        }
+        int dutyHi =  (int)(  ((float)cmdRunTime) *   ((float)percentage)/100);
+        int dutyLo =  (int)(  ((float)cmdRunTime) -   ((float)dutyHi));
+        if( mAlias.equalsIgnoreCase("m1"))
+        {
+            m1_duty_cycle_hi_ms = dutyHi;
+            m1_duty_cycle_lo_ms = dutyLo;
+        }
+        if( mAlias.equalsIgnoreCase("m2"))
+        {
+            m2_duty_cycle_hi_ms = dutyHi;
+            m2_duty_cycle_lo_ms = dutyLo;
+        }
+        logger.info("Changed hi to: [" + dutyHi + "]");
+        logger.info("Changed lo to: [" + dutyLo + "]");
+    }
+
 }

@@ -17,11 +17,6 @@ public class DefaultMoverImpl implements IMover
    IMotor m2;
    MotorProps mp;
 
-   // WHEELCHAIR.F: M1+:h M2+:h
-   // WHEELCHAIR.FL:  M1-:m, M1+:h,  M2+:m, M2+:h
-   //
-   //HashMap<String,List< List<String>> uiCmdToMotorCmds;
-
    @Override
    public void setEbrake(boolean e)
    {
@@ -32,9 +27,11 @@ public class DefaultMoverImpl implements IMover
          logger.error("******* EBRAKE REQUESTED **********");
          m1.setEbrake(e);
          m2.setEbrake(e);
-         move("E");
+         execute("E");
       }
    }
+
+   @Override
    public void init(MotorProps mp) throws Throwable
    {
       this.mp = mp;
@@ -69,10 +66,9 @@ public class DefaultMoverImpl implements IMover
       }
       m1.init(mp);
       m2.init(mp);
-
    }
 
-
+   @Override
    public String dataChanged(String key, String val)
    {
       String ret = null;
@@ -93,7 +89,8 @@ public class DefaultMoverImpl implements IMover
       }
       return ret;
    }
-   public String move(String uiCmd)
+   @Override
+   public String execute(String uiCmd)
    {
       String retMsg = null;
       boolean isRead = false;
@@ -109,7 +106,7 @@ public class DefaultMoverImpl implements IMover
       }
       else {
          // get cmds that we need to run for uiCmd the  provided by caller (usually a user)
-         // examle, if uiCmd is "F", then we'll get something like
+         // example, if uiCmd is "F", then we'll get something like
          // +1 for m1 and +1 for m2 which means pulse M1 (the left motor) once and
          // pulse M2 (the right motor) once
          //
@@ -201,15 +198,13 @@ public class DefaultMoverImpl implements IMover
       return retMsg;
       
    }
-
+   @Override
    public void shutdown()
    {
       m1.brakeAll();
       m2.brakeAll();
    }
-
-
-   }
+}
 
     
 

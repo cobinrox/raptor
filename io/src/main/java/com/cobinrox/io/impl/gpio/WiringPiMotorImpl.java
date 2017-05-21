@@ -105,10 +105,10 @@ String gCmd;
 		{
 			logger.debug("Sending cmd [" + onCmd + "] (SIMULATED)");
 		}
-		//kind of annoying logger.info("          ...end low level move");
+		//kind of annoying logger.info("          ...end low level execute");
 	}
 	public void lowLevelPulse(final String plusOrMinusDirChar, final float notUsed) throws Throwable{
-		logger.debug("          low level move request [" + alias +  plusOrMinusDirChar + "]"  );
+		logger.debug("          low level execute request [" + alias +  plusOrMinusDirChar + "]"  );
 		Process p = null;
 		gCmd = null;
 		String m1Info = null;

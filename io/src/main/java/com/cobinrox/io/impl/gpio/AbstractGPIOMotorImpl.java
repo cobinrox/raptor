@@ -3,22 +3,55 @@ import com.cobinrox.io.impl.IMotor;
 import com.cobinrox.io.impl.MotorProps;
 import org.apache.log4j.Logger;
 
-import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Properties;
 
+/**
+ * High-level implementation for GPIO control of motors.
+ * Lower-level implementation classes would provide lower-level hardware driver
+ * details, e.g. implementation using the pi4j library or, for example, the
+ * WiringPi/python library
+ */
 public abstract class AbstractGPIOMotorImpl implements IMotor {
     static final Logger logger = Logger.getLogger(AbstractGPIOMotorImpl.class);
-    DecimalFormat df = new DecimalFormat("###.#");
+
+    /**
+     * Gpio pin number for M+ and M- connections
+     */
     String plusPinNum;
     String minusPinNum;
+
+    /**
+     * Motor alias, e.g. M1, M2, maps to properties file
+     */
     String alias;
+
+    /**
+     * Emergency brake flag, static and public so that anyone can call in case of
+     * emergency
+     */
     static public boolean ebrake;
 
-    public int numFinishedThreads;
+    /**
+     * When executing a execute (e.g. Forward/Backward, etc.) the movement can actually
+     * consist of multiple lower-level sub-commands, like, e.g.:
+     * F:+1|+1|+1 which contains 3 sub-commands
+     */
     int numCmdsToExpect;
 
+    /**
+     * Keeps track of number of sub-commands that have finished;
+     */
+    public int numFinishedCommands;
+
+    /**
+     * Properties from io properties file
+     */
     MotorProps mp;
+
+    /**
+     * Constructor
+     * @param alias prefix used to identify this motor, maps to properties
+     */
     public AbstractGPIOMotorImpl(String alias) {
         this.alias = alias;
     }
@@ -31,20 +64,7 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
     }
     @Override
     public boolean getEbrake(){ return ebrake;}
-    /*
-    public void reInitCycleLens(long hiCycleLenMs, long lowCycleLenMs, long totalCmdLenMs) {
-        //this.hiCycleLenMs = hiCycleLenMs;
-        //this.lowCycleLenMs = lowCycleLenMs;
-        //this.totalCmdLenMs = totalCmdLenMs;
 
-    }
-
-    public void reInitPinNums(String plusPin, String minusPin) {
-        this.plusPinNum = plusPin;
-        this.minusPinNum = minusPin;
-        hwInit();
-    }
-*/
     @Override
     public void init(MotorProps mp) throws Throwable {
         this.mp = mp;
@@ -53,31 +73,20 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
         //hwInit();
     }
 
-    //abstract protected void hwInit();// {
-        // set GPIO pin outs
-    //}
-
     @Override
-    abstract public void brakeAll() ;//{
-
-    //}
+    abstract public void brakeAll() ;
 
     @Override
     public void setExpectedNumCmds(int numCmdsToExpect) {
         this.numCmdsToExpect = numCmdsToExpect;
-        this.numFinishedThreads = 0;
+        this.numFinishedCommands = 0;
     }
 
     @Override
     public int getNumFinishedCommands() {
-        return numFinishedThreads;
+        return numFinishedCommands;
     }
 
-    /*
-    public void enableDisableDirPin(String plusOrMinus) throws Throwable
-    {
-        lowLevelPulse(plusOrMinus, 0);
-    }*/
     /**
      * @param  pulseCmds array of strings example 2-element value: "+,1", "-,1",
      *             HACK ALERT HACK ALERT: NOW INCLUDING THIS: "+,E", "-,E"
@@ -86,10 +95,10 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
      *             FOR L293D: F:+1,B:-1
      *             FOR ENIO:  F:+E|+1,B:-E|+1
      * @return
-     * @deprecated
      */
     @Override
-    public String nonBlockingPulse( final List<String> pulseCmds, final int cmd_run_time_ms, final int duty_cycle_hi_ms, final int duty_cycle_lo_ms ) {
+    public String nonBlockingPulse( final List<String> pulseCmds, final int cmd_run_time_ms, final int duty_cycle_hi_ms,
+                                    final int duty_cycle_lo_ms ) {
 
         Thread thrd = new Thread() {
             public void run() {
@@ -99,10 +108,11 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                     {
                         logger.error("---------------------EBRAKE!-------------------------");
                         brakeAll();
-                        numFinishedThreads = numCmdsToExpect;
+                        numFinishedCommands = numCmdsToExpect;
                         return;
                     }
                     String[]thisCmd = pulseCmds.get(pulseCmdIdx).split(",");
+                    logger.info("----------------debug thisCmd size/0/1: " + thisCmd.length + "/" + thisCmd[0] + "/" + thisCmd[1]);
                     String plusOrMinusDirChar = thisCmd[0];
                     // HACK ALERT HACK ALERT!
                     if( thisCmd[1].equals("E"))
@@ -115,8 +125,8 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                             lowLevelEnableDisable(thisCmd[0]);
                             //System.out.println("?????");
                             // MAJOR HACK ALERT!!!
-                            logger.debug("     (bumping numFinishedCmds " + numFinishedThreads + ")");
-                            numFinishedThreads++;
+                            logger.debug("     (bumping numFinishedCmds " + numFinishedCommands + ")");
+                            numFinishedCommands++;
                         }
                         catch(Throwable t)
                         {
@@ -133,18 +143,19 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                     {
                         t = Float.parseFloat(thisCmd[1]);
                     }
-                    int numMsHi = (int) (duty_cycle_hi_ms * t);//utyCycleHi;//dutyCycleHi;//(int)((float)numMsToRunCmdFor * (float)((float)dutyCycleHi/(float)100));
-                    int numMsLo = (int) (duty_cycle_lo_ms);
+                    // allow command to run as percentage of normal hi dutycycle
+                    // e.g.  L: -0.25 would be run at only 25% of hi duty cycle, this is to allow for
+                    // tweaking L/R steering commands
+                    int numMsHi = (int) (duty_cycle_hi_ms * t);
+                    //int numMsLo = (int) (duty_cycle_lo_ms);
+                    int numMsLo = cmd_run_time_ms - numMsHi;
+                    //logger.info("-------------------------debug t/num hi/low: " + t + "/" + numMsHi + "/" + numMsLo);
                     long outerStart = System.currentTimeMillis();
                     setName(alias + plusOrMinusDirChar );
                     try {
-                        int numPeriods = (int) ((float) cmd_run_time_ms / ((float) numMsHi + (float) numMsLo));
-                        //logger.info("     Pulsing [" + plusOrMinusDirChar +"], need [" + numPeriods + "] pulses across ["
-                        //        + cmd_run_time_ms + "] ms ...");
                         logger.info("     Pulsing [" + plusOrMinusDirChar +"], pulses across ["
                                 + cmd_run_time_ms + "] ms ...");
                         long elapsedTime = cmd_run_time_ms;
-                        //for (int i = 0; i < numPeriods; i++)
                         while( elapsedTime > 0 )
                         {
                             long startPulseAt = System.currentTimeMillis();
@@ -152,15 +163,15 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                             {
                                 logger.error("---------------------EBRAKE!-------------------------");
                                 brakeAll();
-                                numFinishedThreads = numCmdsToExpect;
+                                numFinishedCommands = numCmdsToExpect;
                                 return;
                             }
-                            logger.info("     turning on for [" + numMsHi + "]ms...");
+                            logger.info("     turning ON for [" + numMsHi + "]ms...");
                             if( t != 0 )lowLevelPulse(plusOrMinusDirChar, t);
                             Thread.sleep(numMsHi);
 
                             if (numMsLo > 0) {
-                                logger.info("     turning off for [" + numMsLo + "]ms...");
+                                logger.info("     turning OFF for [" + numMsLo + "]ms...");
                                 if(t != 0 )lowLevelStop(plusOrMinusDirChar, t);
                                 Thread.sleep(numMsLo);
                             }
@@ -176,8 +187,8 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
                                 + (outerStop - outerStart) + " ms");
                     }
 
-                    logger.debug("     (bumping numFinishedCmds " + numFinishedThreads + ")");
-                    numFinishedThreads++;
+                    logger.debug("     (bumping numFinishedCmds " + numFinishedCommands + ")");
+                    numFinishedCommands++;
                 }
             }
         };
@@ -186,11 +197,26 @@ public abstract class AbstractGPIOMotorImpl implements IMotor {
         return(alias + " nonBlockingPulse started");
     }
 
-    abstract protected void lowLevelEnableDisable(String d) throws Throwable;// {
-    //}
-    abstract protected void lowLevelPulse(String d, float t) throws Throwable;//{
-   /// }
+    /**
+     * Can be used to enable/disable hw board
+     * @param d value to use as disable/enable flag
+     * @throws Throwable
+     */
+    abstract protected void lowLevelEnableDisable(String d) throws Throwable;
 
-    abstract public void lowLevelStop(final String d, final float t) throws Throwable;// {
-    //}
+    /**
+     * Low-level implementation for harwdware to send value
+     * @param d direction
+     * @param t value
+     * @throws Throwable
+     */
+    abstract protected void lowLevelPulse(String d, float t) throws Throwable;
+
+    /**
+     * Low-level stop implementation
+     * @param d direction
+     * @param t value
+     * @throws Throwable
+     */
+    abstract public void lowLevelStop(final String d, final float t) throws Throwable;
 }
