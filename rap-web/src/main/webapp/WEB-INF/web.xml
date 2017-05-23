@@ -14,6 +14,11 @@
     <servlet>
         <servlet-name>EgorServlet</servlet-name>
         <servlet-class>com.cobinrox.servlet.EgorServlet</servlet-class>
+        <init-param>
+            <param-name>propsFileName</param-name>
+            <!--param-value>/home/pi/share/raptor/saberwc.properties</param-value-->
+            <param-value>/home/pi/share/raptor/sparkfunwc.properties</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>

@@ -37,6 +37,7 @@ public class EgorServlet extends javax.servlet.http.HttpServlet {
     static final Logger logger = Logger.getLogger(EgorServlet.class);
     static boolean stupid;
     ServletConfig servletConfig;
+    static String propFileName;
 
     /**
      * Called by container the first time when the servlet is invoked
@@ -45,9 +46,11 @@ public class EgorServlet extends javax.servlet.http.HttpServlet {
      */
     public void init(ServletConfig config) throws ServletException
     {
+        super.init(config);
         servletConfig = config;
         String dir = System.getProperty("user.dir");
         System.err.println("Current dir = " + dir);
+        logger.info("Current dir: [" + dir + "]");
         Enumeration e = Logger.getRootLogger().getAllAppenders();
         while ( e.hasMoreElements() ){
             Appender app = (Appender)e.nextElement();
@@ -55,7 +58,8 @@ public class EgorServlet extends javax.servlet.http.HttpServlet {
                 System.err.println("LogFile: " + ((FileAppender)app).getFile());
             }
         }
-        System.out.println("arg0: " + servletConfig.getInitParameter("arg0"));
+        propFileName = servletConfig.getInitParameter("propsFileName");
+        logger.info("Prop file name from web.xml: [" + propFileName + "]");
     }
     protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
         if(! stupid )
@@ -85,15 +89,19 @@ out.flush();
          */
         request.getRequestDispatcher(request.getParameter("viewid")).forward(request, response);
     }
-    EzWiringPiGpioPulse ep;
     protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+        logger.info("TEST TEST TEST name: " + propFileName);
         String leCmd = request.getParameter("leCmd"); // get param from caller
         logger.info("In doGet, with request [" + leCmd + "]");
         response.setContentType("application/json");
         String responseStr = "";
         if( leCmd != null )
         {
-            if( dmc == null ) dmc = new DoMotorCmd();
+            if( dmc == null )
+            {
+                logger.info("Creating new instance of dmc/w props file name [" + propFileName + "]");
+                dmc = new DoMotorCmd(propFileName);
+            }
             responseStr = dmc.doThis(request.getParameter("leCmd"));
         }
         else
