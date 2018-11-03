@@ -1,6 +1,7 @@
 # RAPTOR
 
  Raspberry Pi Motor Control Project
+ V0.2
 
 
 
